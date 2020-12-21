@@ -1,0 +1,9 @@
+{
+  "name": "zelex",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": ["node", "nodejs", "express", "middleware", "logging", "logger", "request"],
+  "author": "wintpann",
+  "license": "MIT"
+}
