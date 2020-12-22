@@ -1,15 +1,14 @@
 # ZELEX - requirements
-
-## What it should be
     NodeJs Express middleware smart logger
     
-## What info it should save
-### Watch requests and
-* Save info about request:
+## Part 1 - COLLECT LOGS
+
+### 1.1 Collect info about
+* request:
     * traffic (incoming, outgoing, total)
     * body
     * raw headers
-    * location (coordinates)
+    * location (latitude, longitude)
     * city
     * region
     * country
@@ -17,21 +16,13 @@
     * ip
     * path
     * method
-* Save info about response
+    * timing (started, finished, duration)
+* response
     * status code
     * raw headers
     * sent data
-* Save info about request timing
-    * started
-    * finished
-    * duration
 
-## Where it should save info
-* MongoDB instance (to serve and aggregate data later)
-* Any other databases
-* Json files
-
-## It should also have associated data logs with request log
+### 1.2 Collect data logs associated with request log
 * level (silly, debug, verbose, info, warn, error)
 * step (e.g. `getting info from database`, `checking token`)
 * name (e.g. `JS_ERROR` for aggregating by the criteria later)
@@ -39,7 +30,76 @@
 * data (custom event data)
 * time
 
-## What it should also have
+### 1.3 Collect separate data logs
+* level (silly, debug, verbose, info, warn, error)
+* step (e.g. `getting info from database`, `checking token`)
+* name (e.g. `JS_ERROR` for aggregating by the criteria later)
+* description (what goes wrong or right, e.g. `DB crashed`)
+* data (custom event data)
+* time
+
+### 1.4 Save logs in
+* MongoDB instance (to serve and aggregate data later)
+* Any other databases
+* Json files
+
+### 1.5 Additional abilities
 * Log event subscribing (for custom log handling)
-* Ability to save custom fields
-* Ability to clear logs after some time
+* Save custom fields
+* Clear logs after some time
+
+> Example of how it should work
+```js
+const { Transport, Logger, LEVEL } = require('zelex')
+const app = require('express')()
+
+const mongoTransport = new Transport.mongo({
+  dbUrl: 'mongodb://localhost:27017/logs', // default = mongodb://localhost:27017/logs
+  saveInterval: 1000 * 60 * 15, // default = 1000 * 60 * 15
+  clearAfter: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
+  saveDataLogs: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
+  saveRequestLogs: true, // default = true
+});
+
+const jsonTransport = new Transport.json({
+  folder: 'logs', // default = logs
+  saveInterval: 1000 * 60 * 15, // default = 1000 * 60 * 15
+  clearAfter: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
+  saveDataLogs: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
+  saveRequestLogs: true, // default = true
+});
+
+const customTransport = new Transport.custom({
+  onDataLog: async (log) => (await fetch.post('/notify-about-fatal', log)), // default = () => {}
+  onRequestLog: (log) => {}, // default = () => {}
+})
+
+const auth = (req, res, next) => next()
+
+const logger = new Logger({
+  transport: {
+    main: mongoTransport,
+    extra: [
+      jsonTransport,
+      customTransport,
+    ]
+  },
+  serve: {
+    auth,
+    app,
+  },
+  customFields: {
+    user: 'req.user',
+  }
+})
+
+app.use(logger)
+app.post('/users', (req, res) => {
+  req.debug({ step: 'start_request', name: 'REQ_START', description: 'just started', data: { customData: 'custom data' } })
+  res.status(201).json({ message: 'user was created' })
+})
+```
+---
+
+## Part 2 - SERVE LOGS
+will be soon
