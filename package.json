@@ -3,7 +3,24 @@
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
-  "keywords": ["node", "nodejs", "express", "middleware", "logging", "logger", "request"],
+  "keywords": [
+    "node",
+    "nodejs",
+    "express",
+    "middleware",
+    "logging",
+    "logger",
+    "request"
+  ],
   "author": "wintpann",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon test-express-app",
+    "request": "curl localhost:3000/test"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.13"
+  }
 }
