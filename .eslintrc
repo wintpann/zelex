@@ -8,8 +8,10 @@
         "airbnb-base"
     ],
     "parserOptions": {
-        "ecmaVersion": 12
+        "ecmaVersion": 2020
     },
     "rules": {
+        "no-underscore-dangle": ["error", { "allowAfterThis": true }],
+        "no-plusplus": "off"
     }
 }

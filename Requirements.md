@@ -54,17 +54,17 @@ const { Transport, Logger, LEVEL } = require('zelex')
 const app = require('express')()
 
 const mongoTransport = new Transport.mongo({
-  dbUrl: 'mongodb://localhost:27017/logs', // default = mongodb://localhost:27017/logs
+  path: 'mongodb://localhost:27017/logs', // default = mongodb://localhost:27017/logs
   saveInterval: 1000 * 60 * 15, // default = 1000 * 60 * 15
-  clearAfter: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
+  clearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
   saveDataLogs: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
   saveRequestLogs: true, // default = true
 });
 
 const jsonTransport = new Transport.json({
-  folder: 'logs', // default = logs
+  path: 'logs', // default = logs
   saveInterval: 1000 * 60 * 15, // default = 1000 * 60 * 15
-  clearAfter: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
+  clearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
   saveDataLogs: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
   saveRequestLogs: true, // default = true
 });
@@ -72,6 +72,8 @@ const jsonTransport = new Transport.json({
 const customTransport = new Transport.custom({
   onDataLog: async (log) => (await fetch.post('/notify-about-fatal', log)), // default = () => {}
   onRequestLog: (log) => {}, // default = () => {}
+  saveDataLogs: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
+  saveRequestLogs: true, // default = true
 })
 
 const auth = (req, res, next) => next()
