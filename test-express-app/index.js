@@ -6,7 +6,7 @@ const PORT = 3000;
 const app = express();
 app.use(cors());
 
-app.get('/test', async (req, res) => {
+app.get('/tests', async (req, res) => {
   res.status(200).send('success\n');
 });
 
