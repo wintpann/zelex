@@ -14,7 +14,7 @@ const {
 const typeCheck = (initialCheckSets = []) => ({
   _checkSets: initialCheckSets,
   append(checkSets) {
-    this._checkSets = [...this._checkSets, ...checkSets];
+    this._checkSets.push(...checkSets);
     return this;
   },
   complete(errorMessage = 'Type validation failed.') {
@@ -22,7 +22,8 @@ const typeCheck = (initialCheckSets = []) => ({
     this._checkSets.forEach((checkSet) => {
       const [fieldName, [isValid, errorMsg]] = checkSet;
       if (!isValid) {
-        errors.push(`${fieldName}: ${errorMsg}`);
+        const checkSetError = `${fieldName}: ${errorMsg}`;
+        errors.push(checkSetError);
       }
     });
     if (errors.length) {
