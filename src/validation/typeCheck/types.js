@@ -22,8 +22,7 @@ const string = (value, isOptional) => Validator(
 );
 
 const date = (value, isOptional) => {
-  const failedToParse = new Date(value).toString() === 'Invalid Date'
-    && new Date(Number(value)).toString() === 'Invalid Date';
+  const failedToParse = new Date(value).toString() === 'Invalid Date';
   return Validator(
     failedToParse,
     'valid date',
@@ -44,7 +43,7 @@ const bool = (value, isOptional) => Validator(
 );
 
 const positiveNumber = (value, isOptional) => Validator(
-  typeof Number(value) !== 'number' || Number(value) < 0,
+  typeof value !== 'number' || value < 0,
   'positive number',
   isOptional,
 );
@@ -75,11 +74,14 @@ const oneOf = (...validators) => (value, isOptional) => {
 };
 
 const arrayOf = (itemValidator) => (value, isOptional) => {
-  Validator(
+  const [notArray] = Validator(
     !Array.isArray(value),
     'array',
     isOptional,
   );
+  if (!notArray) {
+    return [false, 'Expected array'];
+  }
   for (let i = 0; i < value.length; i++) {
     const item = value[i];
     const [isValid, typeErrorMsg] = itemValidator(item, false);

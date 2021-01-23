@@ -11,9 +11,9 @@ const {
   positiveNumber,
 } = require('./types');
 
-const typeCheck = (initialCheckSets = []) => ({
+const typeCheck = (...initialCheckSets) => ({
   _checkSets: initialCheckSets,
-  append(checkSets) {
+  append(...checkSets) {
     this._checkSets.push(...checkSets);
     return this;
   },

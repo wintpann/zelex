@@ -17,11 +17,12 @@
   "scripts": {
     "start": "nodemon test-express-app",
     "request": "curl localhost:3000/test",
-    "test": "mocha src/**/__test__/*.js"
+    "test": "mocha src/**/__test__/*.js",
+    "precommit": "yarn lint-staged && yarn test"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "yarn precommit"
     }
   },
   "lint-staged": {
