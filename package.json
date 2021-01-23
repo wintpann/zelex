@@ -17,7 +17,7 @@
   "scripts": {
     "start": "nodemon test-express-app",
     "request": "curl localhost:3000/test",
-    "test": "mocha tests"
+    "test": "mocha src/**/__test__/*.js"
   },
   "husky": {
     "hooks": {
@@ -30,7 +30,7 @@
       "git add"
     ]
   },
-  "devDependencies": {
+  "dependencies": {
     "cors": "^2.8.5",
     "eslint": "^7.18.0",
     "eslint-config-airbnb-base": "^14.2.1",
