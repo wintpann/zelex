@@ -12,6 +12,7 @@
     },
     "rules": {
         "no-underscore-dangle": ["error", { "allowAfterThis": true }],
-        "no-plusplus": "off"
+        "no-plusplus": "off",
+        "class-methods-use-this": "off"
     }
 }
