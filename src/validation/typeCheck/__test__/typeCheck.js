@@ -5,14 +5,11 @@ const {
   string,
   number,
 } = require('../types');
-const {
-  typeCheck,
-  expectType,
-} = require('../index');
+const { typeCheck } = require('../index');
 
 const checker = typeCheck(
-  ['path', expectType('mongo//123', string)],
-  ['number', expectType(123, number)],
+  ['path', 'mongo//123', string],
+  ['number', 123, number],
 );
 
 describe('typeCheck', () => {
@@ -23,8 +20,8 @@ describe('typeCheck', () => {
 
   it('should append checksets on append method', () => {
     checker.append(
-      ['path', expectType('mongo//123', string)],
-      ['port', expectType(123, number)],
+      ['path', 'mongo//123', string],
+      ['port', 123, number],
     );
     // eslint-disable-next-line no-underscore-dangle
     expect(checker._checkSets).to.have.length(4);
@@ -44,9 +41,7 @@ describe('typeCheck', () => {
       let isError = false;
       let errorMsg;
       const desiredErrorMsg = 'test error';
-      checker.append(
-        ['id', expectType('string', number)],
-      );
+      checker.append(['id', 'string', number]);
       try {
         checker.complete(desiredErrorMsg);
       } catch (e) {

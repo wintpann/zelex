@@ -11,6 +11,8 @@ const {
   positiveNumber,
 } = require('./types');
 
+const expectType = (value, validator) => validator(value, false);
+
 const typeCheck = (...initialCheckSets) => ({
   _checkSets: initialCheckSets,
   append(...checkSets) {
@@ -20,7 +22,8 @@ const typeCheck = (...initialCheckSets) => ({
   complete(errorMessage = 'Type validation failed.') {
     const errors = [];
     this._checkSets.forEach((checkSet) => {
-      const [fieldName, [isValid, errorMsg]] = checkSet;
+      const [fieldName, value, validator] = checkSet;
+      const [isValid, errorMsg] = expectType(value, validator);
       if (!isValid) {
         const checkSetError = `${fieldName}: ${errorMsg}`;
         errors.push(checkSetError);
@@ -32,8 +35,6 @@ const typeCheck = (...initialCheckSets) => ({
     }
   },
 });
-
-const expectType = (value, validator) => validator(value, false);
 
 module.exports = {
   typeCheck,

@@ -4,7 +4,6 @@ const {
   bool,
   number,
   typeCheck,
-  expectType,
 } = require('../../../validation/typeCheck');
 const {
   CLEAR_INTERVAL,
@@ -38,11 +37,11 @@ class AbstractTransport {
 
   _validateAbstractTransportInit() {
     typeCheck(
-      ['path', expectType(this._path, string)],
-      ['saveInterval', expectType(this._saveInterval, optional(number))],
-      ['clearAfter', expectType(this._clearAfter, optional(number))],
-      ['saveRequestLogs', expectType(this._saveRequestLogs, optional(bool))],
-      ['saveDataLogs', expectType(this._saveDataLogs, optional(bool))],
+      ['path', this._path, string],
+      ['saveInterval', this._saveInterval, optional(number)],
+      ['clearAfter', this._clearAfter, optional(number)],
+      ['saveRequestLogs', this._saveRequestLogs, optional(bool)],
+      ['saveDataLogs', this._saveDataLogs, optional(bool)],
     ).complete('Failed to create transport, check constructor params.');
   }
 
