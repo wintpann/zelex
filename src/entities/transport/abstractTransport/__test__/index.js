@@ -2,6 +2,7 @@ const { describe, it } = require('mocha');
 const { expect } = require('chai');
 
 const AbstractTransport = require('../index');
+const { LEVEL } = require('../../../../config/constants');
 
 const create = (options) => {
   const transport = new AbstractTransport({ path: '123', ...options });
@@ -18,7 +19,7 @@ const create = (options) => {
   };
 };
 
-const MOCK_LOG = { data: 'random' };
+const MOCK_LOG = { data: 'random', level: LEVEL.DEBUG };
 
 describe('AbstractTransport', () => {
   describe('constructor', () => {
@@ -40,14 +41,13 @@ describe('AbstractTransport', () => {
   });
 
   it('should collect logs', () => {
-    const log = { data: 'random' };
     const { transport, requestLogs, dataLogs } = create();
 
     expect(requestLogs.length).to.equal(0);
     expect(dataLogs.length).to.equal(0);
 
-    transport.collectRequestLog(log);
-    transport.collectDataLog(log);
+    transport.collectRequestLog(MOCK_LOG);
+    transport.collectDataLog(MOCK_LOG);
 
     expect(requestLogs.length).to.equal(1);
     expect(dataLogs.length).to.equal(1);
@@ -58,7 +58,7 @@ describe('AbstractTransport', () => {
       transport,
       requestLogs,
       dataLogs,
-    } = create({ saveDataLogs: false, saveRequestLogs: false });
+    } = create({ saveDataLogLevels: [], saveRequestLogs: false });
 
     expect(requestLogs.length).to.equal(0);
     expect(dataLogs.length).to.equal(0);
@@ -84,5 +84,50 @@ describe('AbstractTransport', () => {
 
     expect(requestLogs.length).to.equal(0);
     expect(dataLogs.length).to.equal(0);
+  });
+
+  describe('should collect logs depending on levels', () => {
+    const LOGS = {
+      INFO: { data: 'mock', level: LEVEL.INFO },
+      WARN: { data: 'mock', level: LEVEL.WARN },
+      ERROR: { data: 'mock', level: LEVEL.ERROR },
+      DEBUG: { data: 'mock', level: LEVEL.DEBUG },
+      FATAL: { data: 'mock', level: LEVEL.FATAL },
+    };
+
+    it('should collect all levels', () => {
+      const { transport, dataLogs } = create({ saveDataLogLevels: LEVEL.ALL });
+      transport.collectDataLog(LOGS.INFO);
+      transport.collectDataLog(LOGS.WARN);
+      transport.collectDataLog(LOGS.ERROR);
+      transport.collectDataLog(LOGS.DEBUG);
+      transport.collectDataLog(LOGS.FATAL);
+      expect(dataLogs.length).to.equal(5);
+    });
+
+    it('should collect one separate level', () => {
+      const { transport, dataLogs } = create({ saveDataLogLevels: [LEVEL.INFO] });
+      transport.collectDataLog(LOGS.INFO);
+      expect(dataLogs.length).to.equal(1);
+      transport.collectDataLog(LOGS.WARN);
+      transport.collectDataLog(LOGS.ERROR);
+      transport.collectDataLog(LOGS.DEBUG);
+      transport.collectDataLog(LOGS.FATAL);
+      expect(dataLogs.length).to.equal(1);
+    });
+
+    it('should collect multiple levels', () => {
+      const { transport, dataLogs } = create({ saveDataLogLevels: [LEVEL.ERROR, LEVEL.FATAL] });
+      transport.collectDataLog(LOGS.INFO);
+      expect(dataLogs.length).to.equal(0);
+      transport.collectDataLog(LOGS.WARN);
+      expect(dataLogs.length).to.equal(0);
+      transport.collectDataLog(LOGS.ERROR);
+      expect(dataLogs.length).to.equal(1);
+      transport.collectDataLog(LOGS.DEBUG);
+      expect(dataLogs.length).to.equal(1);
+      transport.collectDataLog(LOGS.FATAL);
+      expect(dataLogs.length).to.equal(2);
+    });
   });
 });
