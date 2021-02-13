@@ -33,7 +33,7 @@ const typeCheck = (...initialCheckSets) => ({
   },
 });
 
-const expectType = (value, validator) => validator(value, { isOptional: false });
+const expectType = (value, validator) => validator(value, false);
 
 module.exports = {
   typeCheck,
