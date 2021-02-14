@@ -4,7 +4,7 @@
     "outgoing": 3000,
     "total": 5000
   },
-  "timing": {
+  "time": {
     "started": "2021-02-13T20:06:05.118Z",
     "finished": "2021-02-13T20:06:10.118Z",
     "duration": 5000
@@ -43,7 +43,7 @@
   },
   "dataLogs": [
     {
-      "level": "FATAL",
+      "level": 2,
       "step": "getting data from db",
       "name": "JS_ERROR",
       "description": "table does not exist",

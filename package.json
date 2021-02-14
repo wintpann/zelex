@@ -17,7 +17,7 @@
   "scripts": {
     "start": "nodemon test-express-app",
     "request": "curl localhost:3000/test",
-    "test": "mocha src/**/__test__/*.js",
+    "test": "mocha src/**/__test__/*.js --exit",
     "precommit": "yarn lint-staged && yarn test"
   },
   "husky": {

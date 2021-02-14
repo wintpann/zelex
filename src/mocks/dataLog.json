@@ -1,5 +1,5 @@
 {
-  "level": "FATAL",
+  "level": 2,
   "step": "getting data from db",
   "name": "JS_ERROR",
   "description": "table does not exist",

@@ -56,7 +56,7 @@ const app = require('express')()
 const mongoTransport = new Transport.mongo({
   path: 'mongodb://localhost:27017/logs', // default = mongodb://localhost:27017/logs
   saveInterval: 1000 * 60 * 15, // default = 1000 * 60 * 15
-  clearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
+  checkToClearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
   saveDataLogLevels: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
   saveRequestLogs: true, // default = true
 });
@@ -64,7 +64,7 @@ const mongoTransport = new Transport.mongo({
 const jsonTransport = new Transport.json({
   path: 'logs', // default = logs
   saveInterval: 1000 * 60 * 15, // default = 1000 * 60 * 15
-  clearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
+  checkToClearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
   saveDataLogLevels: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
   saveRequestLogs: true, // default = true
 });

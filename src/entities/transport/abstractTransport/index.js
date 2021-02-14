@@ -6,6 +6,7 @@ const {
   arrayOf,
   typeCheck,
 } = require('../../../validation/typeCheck');
+const logger = require('../../../utils/logger');
 const {
   CLEAR_INTERVAL,
   DEFAULT_SAVE_INTERVAL,
@@ -21,6 +22,7 @@ class AbstractTransport {
     clearAfter = DEFAULT_CLEAR_AFTER,
     saveRequestLogs = SAVE_REQUEST_LOGS,
     saveDataLogLevels = SAVE_DATA_LOG_LEVELS,
+    checkToClearInterval = CLEAR_INTERVAL,
   } = {}) {
     this._dataLogs = [];
     this._requestLogs = [];
@@ -30,6 +32,7 @@ class AbstractTransport {
     this._clearAfter = clearAfter;
     this._saveRequestLogs = saveRequestLogs;
     this._saveDataLogLevels = saveDataLogLevels;
+    this._checkToClearInterval = checkToClearInterval;
 
     this._validateAbstractTransportInit();
     this._validatePath();
@@ -43,29 +46,42 @@ class AbstractTransport {
       ['path', this._path, string],
       ['saveInterval', this._saveInterval, optional(number)],
       ['clearAfter', this._clearAfter, optional(number)],
+      ['checkToClearInterval', this._checkToClearInterval, optional(number)],
       ['saveRequestLogs', this._saveRequestLogs, optional(bool)],
       ['saveDataLogLevels', this._saveDataLogLevels, optional(arrayOf(number))],
     ).complete('Failed to create transport, check constructor params.');
   }
 
-  _uploadAllCollectedLogs() {
-    const requestLogs = [...this._requestLogs];
-    const dataLogs = [...this._dataLogs];
+  async _uploadAllCollectedLogs() {
+    try {
+      const requestLogs = [...this._requestLogs];
+      const dataLogs = [...this._dataLogs];
 
-    if (requestLogs.length) {
-      this._uploadRequestLogs(requestLogs);
-    }
-    if (dataLogs.length) {
-      this._uploadDataLogs(dataLogs);
-    }
+      if (requestLogs.length) {
+        this._uploadRequestLogs(requestLogs);
+      }
+      if (dataLogs.length) {
+        this._uploadDataLogs(dataLogs);
+      }
 
-    this._requestLogs.length = 0;
-    this._dataLogs.length = 0;
+      this._requestLogs.length = 0;
+      this._dataLogs.length = 0;
+    } catch (e) {
+      logger.error('could not upload logs', e);
+    }
+  }
+
+  async _clearLogs() {
+    try {
+      await this._clearSavedLogs();
+    } catch (e) {
+      logger.error('could not clear logs', e);
+    }
   }
 
   _setIntervals() {
-    const save = setInterval(this._uploadAllCollectedLogs, this._saveInterval);
-    const clear = setInterval(this._clearSavedLogs, CLEAR_INTERVAL);
+    const save = setInterval(this._uploadAllCollectedLogs.bind(this), this._saveInterval);
+    const clear = setInterval(this._clearLogs.bind(this), this._checkToClearInterval);
     this._timers = { save, clear };
   }
 
