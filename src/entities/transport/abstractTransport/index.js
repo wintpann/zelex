@@ -58,16 +58,16 @@ class AbstractTransport {
       const dataLogs = [...this._dataLogs];
 
       if (requestLogs.length) {
-        this._uploadRequestLogs(requestLogs);
+        await this._uploadRequestLogs(requestLogs);
       }
       if (dataLogs.length) {
-        this._uploadDataLogs(dataLogs);
+        await this._uploadDataLogs(dataLogs);
       }
-
-      this._requestLogs.length = 0;
-      this._dataLogs.length = 0;
     } catch (e) {
       logger.error('could not upload logs', e);
+    } finally {
+      this._requestLogs.length = 0;
+      this._dataLogs.length = 0;
     }
   }
 

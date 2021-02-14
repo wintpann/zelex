@@ -70,7 +70,7 @@ describe('AbstractTransport', () => {
     expect(dataLogs.length).to.equal(0);
   });
 
-  it('should upload all collected logs', () => {
+  it('should upload all collected logs', async () => {
     const { transport, requestLogs, dataLogs } = create();
 
     transport.collectRequestLog(MOCK_LOG);
@@ -80,7 +80,7 @@ describe('AbstractTransport', () => {
     expect(dataLogs.length).to.equal(1);
 
     // eslint-disable-next-line no-underscore-dangle
-    transport._uploadAllCollectedLogs();
+    await transport._uploadAllCollectedLogs();
 
     expect(requestLogs.length).to.equal(0);
     expect(dataLogs.length).to.equal(0);
