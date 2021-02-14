@@ -14,18 +14,18 @@
       "access_token": "Basic auth"
     },
     "headers": {
-      "content-type": "application/json",
-      "location": {
-        "latitude": 123,
-        "longitude": 321
-      },
-      "city": "New York",
-      "region": "Chinatown",
-      "isVPN": true,
-      "ip": "localhost",
-      "path": "super/secret/data",
-      "method": "PUT"
-    }
+      "content-type": "application/json"
+    },
+    "location": {
+      "latitude": 123,
+      "longitude": 321
+    },
+    "city": "New York",
+    "region": "Chinatown",
+    "isVPN": true,
+    "ip": "localhost",
+    "path": "super/secret/data",
+    "method": "PUT"
   },
   "response": {
     "code": 403,

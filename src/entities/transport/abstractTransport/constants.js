@@ -1,12 +1,12 @@
 const {
-  SECOND,
+  MINUTE,
   HOUR,
   DAY,
   LEVEL,
 } = require('../../../config/constants');
 
 const CLEAR_INTERVAL = DAY;
-const DEFAULT_SAVE_INTERVAL = SECOND * 10;
+const DEFAULT_SAVE_INTERVAL = MINUTE * 15;
 const DEFAULT_CLEAR_AFTER = HOUR * 10;
 const SAVE_REQUEST_LOGS = true;
 const SAVE_DATA_LOG_LEVELS = LEVEL.ALL;
