@@ -8,6 +8,8 @@ const {
   shape,
   oneOf,
   bool,
+  never,
+  func,
   positiveNumber,
 } = require('./types');
 
@@ -48,5 +50,7 @@ module.exports = {
   shape,
   oneOf,
   bool,
+  never,
+  func,
   positiveNumber,
 };

@@ -7,6 +7,8 @@ const {
   number,
   array,
   bool,
+  func,
+  never,
   positiveNumber,
   optional,
   arrayOf,
@@ -26,6 +28,8 @@ const VALUES = {
   BOOL: false,
   POSITIVE_NUMBER: 123,
   NEGATIVE_NUMBER: -123,
+  FUNC: () => {},
+  NEVER: undefined,
 };
 
 describe('type checkers', () => {
@@ -47,6 +51,16 @@ describe('type checkers', () => {
 
     it('should fail on array', () => {
       const [result] = expectType(VALUES.ARRAY, string);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on func', () => {
+      const [result] = expectType(VALUES.FUNC, string);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, string);
       expect(result).to.equal(false);
     });
 
@@ -86,6 +100,16 @@ describe('type checkers', () => {
       expect(result).to.equal(true);
     });
 
+    it('should fail on func', () => {
+      const [result] = expectType(VALUES.FUNC, date);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, date);
+      expect(result).to.equal(false);
+    });
+
     it('should pass on date', () => {
       const [result] = expectType(VALUES.DATE, date);
       expect(result).to.equal(true);
@@ -110,6 +134,16 @@ describe('type checkers', () => {
 
     it('should fail on date', () => {
       const [result] = expectType(VALUES.DATE, number);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on func', () => {
+      const [result] = expectType(VALUES.FUNC, number);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, number);
       expect(result).to.equal(false);
     });
 
@@ -145,6 +179,16 @@ describe('type checkers', () => {
       expect(result).to.equal(false);
     });
 
+    it('should fail on func', () => {
+      const [result] = expectType(VALUES.FUNC, positiveNumber);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, positiveNumber);
+      expect(result).to.equal(false);
+    });
+
     it('should pass on positive number', () => {
       const [result] = expectType(VALUES.POSITIVE_NUMBER, positiveNumber);
       expect(result).to.equal(true);
@@ -169,6 +213,16 @@ describe('type checkers', () => {
 
     it('should fail on number', () => {
       const [result] = expectType(VALUES.POSITIVE_NUMBER, array);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on func', () => {
+      const [result] = expectType(VALUES.FUNC, array);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, array);
       expect(result).to.equal(false);
     });
 
@@ -231,6 +285,16 @@ describe('type checkers', () => {
       expect(result).to.equal(false);
     });
 
+    it('should fail on func', () => {
+      const [result] = expectType(VALUES.FUNC, bool);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, bool);
+      expect(result).to.equal(false);
+    });
+
     it('should pass on bool', () => {
       const [result] = expectType(VALUES.BOOL, bool);
       expect(result).to.equal(true);
@@ -281,6 +345,80 @@ describe('type checkers', () => {
     it('should pass on desired type', () => {
       const [stringValid] = expectType(desiredValue, desiredValidator);
       expect(stringValid).to.equal(true);
+    });
+  });
+
+  describe('func validator', () => {
+    it('should fail on array', () => {
+      const [result] = expectType(VALUES.ARRAY, func);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on string', () => {
+      const [result] = expectType(VALUES.STRING, func);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on bool', () => {
+      const [result] = expectType(VALUES.BOOL, func);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on date', () => {
+      const [result] = expectType(VALUES.DATE, func);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on number', () => {
+      const [result] = expectType(VALUES.POSITIVE_NUMBER, func);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, func);
+      expect(result).to.equal(false);
+    });
+
+    it('should pass on func', () => {
+      const [result] = expectType(VALUES.FUNC, func);
+      expect(result).to.equal(true);
+    });
+  });
+
+  describe('func validator', () => {
+    it('should fail on array', () => {
+      const [result] = expectType(VALUES.ARRAY, never);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on string', () => {
+      const [result] = expectType(VALUES.STRING, never);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on bool', () => {
+      const [result] = expectType(VALUES.BOOL, never);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on date', () => {
+      const [result] = expectType(VALUES.DATE, never);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on number', () => {
+      const [result] = expectType(VALUES.POSITIVE_NUMBER, never);
+      expect(result).to.equal(false);
+    });
+
+    it('should fail on func', () => {
+      const [result] = expectType(VALUES.FUNC, never);
+      expect(result).to.equal(false);
+    });
+
+    it('should pass on undefined', () => {
+      const [result] = expectType(VALUES.NEVER, never);
+      expect(result).to.equal(true);
     });
   });
 

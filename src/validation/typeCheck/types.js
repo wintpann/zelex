@@ -42,6 +42,18 @@ const bool = (value, isOptional) => Validator(
   isOptional,
 );
 
+const never = (value) => Validator(
+  typeof value !== 'undefined',
+  'never',
+  false,
+);
+
+const func = (value, isOptional) => Validator(
+  typeof value !== 'function',
+  'function',
+  isOptional,
+);
+
 const positiveNumber = (value, isOptional) => Validator(
   typeof value !== 'number' || value < 0,
   'positive number',
@@ -128,5 +140,7 @@ module.exports = {
   shape,
   oneOf,
   bool,
+  never,
+  func,
   positiveNumber,
 };
