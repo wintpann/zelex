@@ -23,7 +23,7 @@
     * sent data
 
 ### 1.2 Collect data logs associated with request log
-* level (silly, debug, verbose, info, warn, error)
+* level (debug, fatal, info, warn, error)
 * step (e.g. `getting info from database`, `checking token`)
 * name (e.g. `JS_ERROR` for aggregating by the criteria later)
 * description (what goes wrong or right, e.g. `DB crashed`)
@@ -31,7 +31,7 @@
 * time
 
 ### 1.3 Collect separate data logs
-* level (silly, debug, verbose, info, warn, error)
+* level (debug, fatal, info, warn, error)
 * step (e.g. `getting info from database`, `checking token`)
 * name (e.g. `JS_ERROR` for aggregating by the criteria later)
 * description (what goes wrong or right, e.g. `DB crashed`)
@@ -96,7 +96,7 @@ const logger = new Logger({
   }
 })
 
-app.use(logger)
+app.use(logger.watch)
 app.post('/users', (req, res) => {
   req.debug({ step: 'start_request', name: 'REQ_START', description: 'just started', data: { customData: 'custom data' } })
   res.status(201).json({ message: 'user was created' })

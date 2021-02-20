@@ -32,6 +32,8 @@
     ]
   },
   "dependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "cors": "^2.8.5",
     "eslint": "^7.18.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -39,8 +41,8 @@
     "express": "^4.17.1",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.3",
+    "mocha": "^8.2.1",
     "mongoose": "^5.11.13",
-    "chai": "^4.2.0",
-    "mocha": "^8.2.1"
+    "request-stats": "^3.0.0"
   }
 }

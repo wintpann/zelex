@@ -1,9 +1,9 @@
 {
   "level": 2,
+  "time": "2021-02-13T20:06:05.118Z",
   "step": "getting data from db",
   "name": "JS_ERROR",
   "description": "table does not exist",
-  "time": "2021-02-13T20:06:05.118Z",
   "data": {
     "some": {
       "random": {
