@@ -9,6 +9,20 @@ const [REQUEST_FOLDER, DATA_FOLDER] = ['request', 'data'];
 const SEPARATOR = '@';
 
 class JSONTransport extends AbstractTransport {
+  constructor(options) {
+    super({
+      ...options,
+      canServe: true,
+    });
+  }
+
+  _checkServeOptions() {
+    const serveURLPassed = Boolean(this._serveURL);
+    if (serveURLPassed) {
+      logger.warn('You passed serveURL to JSON transport. Assume that serving by JSON transport is not good idea');
+    }
+  }
+
   async _writeLogs(folder, logs) {
     const createFiles = logs.map((log) => new Promise((resolve) => {
       const time = log.time.started || log.time;

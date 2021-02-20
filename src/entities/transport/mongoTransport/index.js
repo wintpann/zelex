@@ -8,7 +8,10 @@ const DataLogSchema = require('./schemas/dataLog');
 
 class MongoTransport extends AbstractTransport {
   constructor(options) {
-    super(options);
+    super({
+      ...options,
+      canServe: true,
+    });
     this._connect();
   }
 

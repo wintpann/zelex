@@ -2,6 +2,7 @@ const {
   optional,
   string,
   bool,
+  func,
   number,
   arrayOf,
   typeCheck,
@@ -13,6 +14,7 @@ const {
   DEFAULT_CLEAR_AFTER,
   SAVE_REQUEST_LOGS,
   SAVE_DATA_LOG_LEVELS,
+  DEFAULT_AUTH,
 } = require('./constants');
 
 class AbstractTransport {
@@ -23,6 +25,9 @@ class AbstractTransport {
     saveRequestLogs = SAVE_REQUEST_LOGS,
     saveDataLogLevels = SAVE_DATA_LOG_LEVELS,
     checkToClearInterval = CLEAR_INTERVAL,
+    canServe = false,
+    serveURL,
+    auth = DEFAULT_AUTH,
   } = {}) {
     this._dataLogs = [];
     this._requestLogs = [];
@@ -34,22 +39,34 @@ class AbstractTransport {
     this._saveDataLogLevels = saveDataLogLevels;
     this._checkToClearInterval = checkToClearInterval;
 
+    this._canServe = canServe;
+    this._serveURL = serveURL;
+    this._auth = auth;
+
     this._validateAbstractTransportInit();
     this._validatePath();
+    this._checkServeOptions();
     this._setIntervals();
 
     this._saveDataLogFlag = this._saveDataLogLevels.reduce((acc, i) => acc | i, 0);
   }
 
   _validateAbstractTransportInit() {
-    typeCheck(
+    const validate = typeCheck(
       ['path', this._path, string],
       ['saveInterval', this._saveInterval, optional(number)],
       ['clearAfter', this._clearAfter, optional(number)],
       ['checkToClearInterval', this._checkToClearInterval, optional(number)],
       ['saveRequestLogs', this._saveRequestLogs, optional(bool)],
       ['saveDataLogLevels', this._saveDataLogLevels, optional(arrayOf(number))],
-    ).complete('Failed to create transport, check constructor params.');
+    );
+    if (this._canServe) {
+      validate.append(
+        ['serveURL', this._serveURL, optional(string)],
+        ['auth', this._auth, optional(func)],
+      );
+    }
+    validate.complete('Failed to create transport, check constructor params.');
   }
 
   async _uploadAllCollectedLogs() {
@@ -96,6 +113,9 @@ class AbstractTransport {
   }
 
   _validatePath() {
+  }
+
+  _checkServeOptions() {
   }
 
   // public
