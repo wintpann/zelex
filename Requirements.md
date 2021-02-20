@@ -53,6 +53,8 @@
 const { Transport, Logger, LEVEL } = require('zelex')
 const app = require('express')()
 
+const auth = (req) => ({ denied: true, message: 'Access was denied' })
+
 const mongoTransport = new Transport.mongo({
   path: 'mongodb://localhost:27017/logs', // default = mongodb://localhost:27017/logs
   saveInterval: 1000 * 60 * 15, // default = 1000 * 60 * 15
@@ -60,6 +62,8 @@ const mongoTransport = new Transport.mongo({
   checkToClearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
   saveDataLogLevels: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
   saveRequestLogs: true, // default = true
+  serveURL: 'mongo',
+  auth, // default = () => ({ denied: false, message: '' })
 });
 
 const jsonTransport = new Transport.json({
@@ -69,6 +73,8 @@ const jsonTransport = new Transport.json({
   checkToClearInterval: 1000 * 60 * 60 * 24 * 7, // default = 1000 * 60 * 60 * 24 * 7
   saveDataLogLevels: [ level.info, level.warn, level.error, level.debug, level.fatal ], // default = level.all
   saveRequestLogs: true, // default = true
+  serveURL: 'json',
+  auth, // default = () => ({ denied: false, message: '' })
 });
 
 const customTransport = new Transport.custom({
@@ -78,21 +84,14 @@ const customTransport = new Transport.custom({
   saveRequestLogs: true, // default = true
 })
 
-const auth = (req, res, next) => next()
-
 const logger = new Logger({
-  transport: {
-    main: mongoTransport,
-    extra: [
-      jsonTransport,
-      customTransport,
-    ]
-  },
-  serve: {
-    auth,
-    app,
-  },
-  customFields: {
+  transport: [
+    mongoTransport,
+    jsonTransport,
+    customTransport,
+  ],
+  app,
+  extras: {
     user: 'req.user',
   }
 })
