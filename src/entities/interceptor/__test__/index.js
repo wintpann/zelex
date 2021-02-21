@@ -1,38 +1,28 @@
-const { promisify } = require('util');
-const express = require('express');
-const cors = require('cors');
-const { describe, it } = require('mocha');
-const chaiHttp = require('chai-http');
-const chai = require('chai');
+const {
+  describe,
+  it,
+  expect,
+  app,
+  agent,
+  handleRoute,
+} = require('../../../utils/express-test');
 
 const Interceptor = require('../index');
 
-chai.use(chaiHttp);
-const { expect, request } = chai;
+const watch = Interceptor.watch.bind(Interceptor);
 
 describe('Interceptor', async () => {
-  const PORT = 3001;
-  const app = express();
-  app.use(cors());
-
-  const interceptor = new Interceptor();
-  app.use(interceptor.watch.bind(interceptor));
-
-  app.get('/interceptor', async (req, res) => {
-    res.status(200).send('success');
-  });
-
-  const listen = promisify(app.listen);
-  await listen(PORT);
+  app.use(watch);
+  app.get('/interceptor', handleRoute());
 
   it('should intercept request and save body', async () => {
     let result = {};
 
-    interceptor.onEnd((info) => {
+    Interceptor.onEnd((info) => {
       result = info;
     });
 
-    await request(app).get('/interceptor');
+    await agent.get('/interceptor');
 
     expect(result.ok).to.equal(true);
     expect(result.time).to.be.a('number');
