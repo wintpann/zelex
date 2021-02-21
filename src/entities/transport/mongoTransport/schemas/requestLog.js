@@ -24,6 +24,8 @@ const requestLogSchema = new Schema({
     ip: String,
     path: String,
     method: String,
+    params: Object,
+    query: Object,
   },
   response: {
     code: Number,
@@ -33,6 +35,7 @@ const requestLogSchema = new Schema({
   extra: Object,
   dataLogs: [{
     level: Number,
+    levelHumanized: String,
     step: String,
     name: String,
     description: String,

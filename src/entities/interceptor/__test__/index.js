@@ -5,11 +5,12 @@ const {
   app,
   agent,
   handleRoute,
-} = require('../../../utils/express-test');
+} = require('../../../utils/express-test')();
 
 const Interceptor = require('../index');
 
-const watch = Interceptor.watch.bind(Interceptor);
+const interceptor = new Interceptor();
+const watch = interceptor.watch.bind(interceptor);
 
 describe('Interceptor', async () => {
   app.use(watch);
@@ -18,7 +19,7 @@ describe('Interceptor', async () => {
   it('should intercept request and save body', async () => {
     let result = {};
 
-    Interceptor.onEnd((info) => {
+    interceptor.onEnd((info) => {
       result = info;
     });
 

@@ -25,7 +25,9 @@
     "isVPN": true,
     "ip": "localhost",
     "path": "super/secret/data",
-    "method": "PUT"
+    "method": "PUT",
+    "params": {},
+    "query": {}
   },
   "response": {
     "code": 403,
@@ -44,6 +46,7 @@
   "dataLogs": [
     {
       "level": 2,
+      "levelHumanized": "Info",
       "step": "getting data from db",
       "name": "JS_ERROR",
       "description": "table does not exist",

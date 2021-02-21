@@ -25,4 +25,4 @@ class Interceptor {
   }
 }
 
-module.exports = new Interceptor();
+module.exports = Interceptor;

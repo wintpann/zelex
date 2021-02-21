@@ -13,10 +13,23 @@ const randomString = (size = 10) => crypto
   .toString('base64')
   .slice(0, size);
 
+const dig = (object = {}, path = '', defaultValue = '--') => {
+  const levels = path.split('.');
+  let stepValue = object;
+  levels.forEach((level) => {
+    try {
+      stepValue = stepValue[level];
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+  });
+  return stepValue || defaultValue;
+};
+
 module.exports = {
   delay,
   last,
   first,
   noop,
   randomString,
+  dig,
 };

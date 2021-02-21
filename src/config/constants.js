@@ -12,10 +12,22 @@ const LEVEL = {
   ALL: [2, 4, 8, 16, 32],
 };
 
+const LEVEL_HUMANIZED = {
+  [LEVEL.INFO]: 'Info',
+  [LEVEL.WARN]: 'Warning',
+  [LEVEL.ERROR]: 'Error',
+  [LEVEL.DEBUG]: 'Debug',
+  [LEVEL.FATAL]: 'Fatal',
+};
+
+const ZX_PRIVATE = Symbol('ZX_PRIVATE');
+
 module.exports = {
   SECOND,
   MINUTE,
   HOUR,
   DAY,
   LEVEL,
+  LEVEL_HUMANIZED,
+  ZX_PRIVATE,
 };

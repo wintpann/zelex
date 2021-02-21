@@ -1,12 +1,14 @@
 const logger = require('../../utils/logger');
-const { LEVEL } = require('../../config/constants');
+const {
+  LEVEL,
+  ZX_PRIVATE,
+} = require('../../config/constants');
 const {
   typeCheck,
   optional,
   string,
   shape,
 } = require('../../validation/typeCheck');
-const { ZX_PRIVATE } = require('./constants');
 
 const createDataLog = (req, level) => (options) => {
   const time = new Date();

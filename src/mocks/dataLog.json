@@ -1,5 +1,6 @@
 {
   "level": 2,
+  "levelHumanized": "Info",
   "time": "2021-02-13T20:06:05.118Z",
   "step": "getting data from db",
   "name": "JS_ERROR",
