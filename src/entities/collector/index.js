@@ -9,8 +9,8 @@ class Collector {
     this._extras = extras;
   }
 
-  async collect(raw) {
-    const log = await getRequestLog(raw, this._extras);
+  collect(raw) {
+    const log = getRequestLog(raw, this._extras);
     this._transports.forEach((transport) => transport.collectRequestLog(log));
   }
 }

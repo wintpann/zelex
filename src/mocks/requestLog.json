@@ -9,6 +9,14 @@
     "finished": "2021-02-13T20:06:10.118Z",
     "duration": 5000
   },
+  "geo": {
+    "location": {
+      "latitude": 123,
+      "longitude": 321
+    },
+    "city": "New York",
+    "region": "Chinatown"
+  },
   "request": {
     "body": {
       "access_token": "Basic auth"
@@ -16,13 +24,6 @@
     "headers": {
       "content-type": "application/json"
     },
-    "location": {
-      "latitude": 123,
-      "longitude": 321
-    },
-    "city": "New York",
-    "region": "Chinatown",
-    "isVPN": true,
     "ip": "localhost",
     "path": "super/secret/data",
     "method": "PUT",

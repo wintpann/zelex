@@ -22,6 +22,13 @@ const LEVEL_HUMANIZED = {
 
 const ZX_PRIVATE = Symbol('ZX_PRIVATE');
 
+const COLORS = {
+  RED: '\x1b[31m',
+  GREEN: '\x1b[32m',
+  YELLOW: '\x1b[33m',
+  BLUE: '\x1b[34m',
+};
+
 module.exports = {
   SECOND,
   MINUTE,
@@ -30,4 +37,5 @@ module.exports = {
   LEVEL,
   LEVEL_HUMANIZED,
   ZX_PRIVATE,
+  COLORS,
 };

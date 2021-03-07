@@ -23,51 +23,26 @@ const getTimeInfo = ({ time }) => {
   };
 };
 
-const mockUserInfo = {
+const emptyGeoInfo = {
   location: {
     latitude: 0,
     longitude: 0,
   },
-  city: 'No data',
-  region: 'No data',
-  isVPN: false,
+  city: '',
+  region: '',
 };
 
-// TODO
-const getUserInfo = async () => mockUserInfo;
+const getGeoInfo = () => emptyGeoInfo;
 
-const getRequestInfo = async ({ req }) => {
-  const {
-    body,
-    headers,
-    originalUrl,
-    params,
-    query,
-  } = req.raw;
-  const {
-    ip,
-    method,
-  } = req;
-
-  let userInfo = mockUserInfo;
-
-  try {
-    userInfo = await getUserInfo();
-  } catch (e) {
-    logger.error('failed to get user info');
-  }
-
-  return {
-    body,
-    headers,
-    ...userInfo,
-    ip,
-    method,
-    path: originalUrl,
-    params,
-    query,
-  };
-};
+const getRequestInfo = ({ req }) => ({
+  body: req.raw.body,
+  headers: req.raw.body,
+  path: req.raw.originalUrl,
+  params: req.raw.params,
+  query: req.raw.query,
+  ip: req.ip,
+  method: req.method,
+});
 
 const getResponseInfo = ({ res }) => ({
   code: res.status,
@@ -94,13 +69,14 @@ const getDataLogs = ({ req }) => req.raw[ZX_PRIVATE]
     levelHumanized: LEVEL_HUMANIZED[log.level],
   }));
 
-const getRequestLog = async (raw, extras) => {
+const getRequestLog = (raw, extras) => {
   let log;
   try {
     log = {};
     log.traffic = getTrafficInfo(raw);
     log.time = getTimeInfo(raw);
-    log.request = await getRequestInfo(raw);
+    log.geo = getGeoInfo(raw);
+    log.request = getRequestInfo(raw);
     log.response = getResponseInfo(raw);
     log.extra = getExtraInfo(raw, extras);
     log.dataLogs = getDataLogs(raw);

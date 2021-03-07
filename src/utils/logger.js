@@ -1,11 +1,16 @@
-const info = (...args) => console.log('[ZELEX] INFO:', ...args);
+const { COLORS } = require('../config/constants');
 
-const warn = (...args) => console.warn('[ZELEX]: WARNING', ...args);
+const info = (...args) => console.log(COLORS.BLUE, '[ZELEX] INFO:', ...args);
 
-const error = (...args) => console.error('[ZELEX]: ERROR', ...args);
+const success = (...args) => console.log(COLORS.GREEN, '[ZELEX] INFO:', ...args);
+
+const warn = (...args) => console.warn(COLORS.YELLOW, '[ZELEX]: WARNING', ...args);
+
+const error = (...args) => console.error(COLORS.RED, '[ZELEX]: ERROR', ...args);
 
 module.exports = {
   info,
   warn,
   error,
+  success,
 };

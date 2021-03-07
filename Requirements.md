@@ -12,7 +12,6 @@
     * city
     * region
     * country
-    * isVPN
     * ip
     * path
     * method

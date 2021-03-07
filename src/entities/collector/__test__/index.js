@@ -55,8 +55,8 @@ describe('Collector', () => {
   it('should collect request info with extras and data logs', (done) => {
     let error = '';
 
-    interceptor.onEnd(async (info) => {
-      await collector.collect(info);
+    interceptor.onEnd((info) => {
+      collector.collect(info);
 
       try {
         typeCheck(
@@ -71,16 +71,17 @@ describe('Collector', () => {
               finished: date,
               duration: number,
             }),
-            request: shape({
-              body: shape({}),
-              headers: shape({}),
+            geo: optional(shape({
               location: shape({
                 latitude: number,
                 longitude: number,
               }),
               city: string,
               region: string,
-              isVPN: bool,
+            })),
+            request: shape({
+              body: shape({}),
+              headers: shape({}),
               ip: string,
               method: string,
               path: string,

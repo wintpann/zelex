@@ -19,8 +19,8 @@ class MongoTransport extends AbstractTransport {
     this._connection = mongoose.createConnection(this._path, DB_OPTIONS);
 
     this._connection
-      .then(() => logger.info('mongodb connection established'))
-      .catch(() => logger.error('mongodb connection failed'));
+      .then(() => logger.success('mongodb connection established'))
+      .catch((e) => logger.error('mongodb connection failed', e.message));
 
     this._connection.on('close', () => logger.info('mongodb connection closed'));
 

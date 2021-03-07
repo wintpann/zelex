@@ -11,16 +11,17 @@ const requestLogSchema = new Schema({
     finished: Date,
     duration: Number,
   },
-  request: {
-    body: Object,
-    headers: Object,
+  geo: {
     location: {
       latitude: Number,
       longitude: Number,
     },
     city: String,
     region: String,
-    isVPN: Boolean,
+  },
+  request: {
+    body: Object,
+    headers: Object,
     ip: String,
     path: String,
     method: String,
