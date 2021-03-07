@@ -1,7 +1,7 @@
 const fs = require('fs');
 const AbstractTransport = require('../abstractTransport');
 const logger = require('../../../utils/logger');
-const { randomString } = require('../../../helpers/common');
+const { randomNumberString } = require('../../../helpers/common');
 const { readdir } = require('../../../helpers/promisified');
 const { last, first } = require('../../../helpers/common');
 const { getLogBuffer } = require('./helpers');
@@ -10,9 +10,25 @@ const [REQUEST_FOLDER, DATA_FOLDER] = ['request', 'data'];
 const SEPARATOR = '@';
 
 class JSONTransport extends AbstractTransport {
-  constructor(options) {
+  constructor({
+    path,
+    saveInterval,
+    clearAfter,
+    saveRequestLogs,
+    saveDataLogLevels,
+    checkToClearInterval,
+    serveURL,
+    auth,
+  }) {
     super({
-      ...options,
+      path,
+      saveInterval,
+      clearAfter,
+      saveRequestLogs,
+      saveDataLogLevels,
+      checkToClearInterval,
+      serveURL,
+      auth,
       canServe: true,
     });
   }
@@ -27,7 +43,7 @@ class JSONTransport extends AbstractTransport {
   async _writeLogs(folder, logs) {
     const createFiles = logs.map((log) => new Promise((resolve) => {
       const time = log.time.started || log.time;
-      const fileName = `${this._path}/${folder}/${time}${SEPARATOR}${randomString()}`;
+      const fileName = `${this._path}/${folder}/${time}${SEPARATOR}${randomNumberString()}`;
       const buffer = getLogBuffer(log);
 
       fs.writeFile(fileName, buffer, (err) => {

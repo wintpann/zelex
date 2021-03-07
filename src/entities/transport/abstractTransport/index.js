@@ -71,14 +71,11 @@ class AbstractTransport {
 
   async _uploadAllCollectedLogs() {
     try {
-      const requestLogs = [...this._requestLogs];
-      const dataLogs = [...this._dataLogs];
-
-      if (requestLogs.length) {
-        await this._uploadRequestLogs(requestLogs);
+      if (this._requestLogs.length) {
+        await this._uploadRequestLogs(this._requestLogs);
       }
-      if (dataLogs.length) {
-        await this._uploadDataLogs(dataLogs);
+      if (this._dataLogs.length) {
+        await this._uploadDataLogs(this._dataLogs);
       }
     } catch (e) {
       logger.error('could not upload logs', e);

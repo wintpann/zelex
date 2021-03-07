@@ -10,12 +10,20 @@ const {
   shape,
 } = require('../../validation/typeCheck');
 
-const createDataLog = (req, level) => (options) => {
+const createDataLog = (req, level) => ({
+  step,
+  name,
+  description,
+  data,
+}) => {
   const time = new Date();
   const log = {
     level,
     time,
-    ...options,
+    step,
+    name,
+    description,
+    data,
   };
   try {
     typeCheck(

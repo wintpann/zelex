@@ -15,8 +15,8 @@
   "author": "wintpann",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon test-express-app",
     "request": "curl localhost:3000/test",
+    "go": "node manual-express-test",
     "test": "mocha src/**/__test__/*.js --exit",
     "precommit": "yarn lint-staged && yarn test"
   },

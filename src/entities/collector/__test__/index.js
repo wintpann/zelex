@@ -54,7 +54,7 @@ describe('Collector', () => {
   it('should collect request info with extras and data logs', (done) => {
     let error = '';
 
-    interceptor.onEnd((info) => {
+    interceptor.onEvery((info) => {
       collector.collect(info);
 
       try {

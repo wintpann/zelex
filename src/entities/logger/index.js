@@ -21,19 +21,20 @@ class Logger {
     this._validateTransports();
 
     this._interceptor = new Interceptor();
+    this._interceptor.watch = this._interceptor.watch.bind(this._interceptor);
+
     this._collector = new Collector({
       transports: this._transports,
       extras: this._extras,
     });
+
+    this._interceptor.onEvery((raw) => {
+      this._collector.collect(raw);
+    });
   }
 
   watch(req, res, next) {
-    const watcher = this._interceptor.watch.bind(this._interceptor);
-    watcher(req, res, next);
-
-    this._interceptor.onEnd((raw) => {
-      this._collector.collect(raw);
-    });
+    this._interceptor.watch(req, res, next);
   }
 
   _getTransports(transport) {

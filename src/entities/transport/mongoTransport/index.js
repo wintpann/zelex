@@ -7,9 +7,25 @@ const RequestLogSchema = require('./schemas/requestLog');
 const DataLogSchema = require('./schemas/dataLog');
 
 class MongoTransport extends AbstractTransport {
-  constructor(options) {
+  constructor({
+    path,
+    saveInterval,
+    clearAfter,
+    saveRequestLogs,
+    saveDataLogLevels,
+    checkToClearInterval,
+    serveURL,
+    auth,
+  }) {
     super({
-      ...options,
+      path,
+      saveInterval,
+      clearAfter,
+      saveRequestLogs,
+      saveDataLogLevels,
+      checkToClearInterval,
+      serveURL,
+      auth,
       canServe: true,
     });
     this._connect();
