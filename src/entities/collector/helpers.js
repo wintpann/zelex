@@ -1,3 +1,4 @@
+const url = require('url');
 const { dig } = require('../../helpers/common');
 const {
   LEVEL_HUMANIZED,
@@ -37,7 +38,7 @@ const getGeoInfo = () => emptyGeoInfo;
 const getRequestInfo = ({ req }) => ({
   body: req.raw.body,
   headers: req.raw.body,
-  path: req.raw.originalUrl,
+  path: url.parse(req.raw.originalUrl).pathname,
   params: req.raw.params,
   query: req.raw.query,
   ip: req.ip,

@@ -17,6 +17,35 @@ const DEFAULT_AUTH = () => ({
   message: '',
 });
 
+const SORT_OPTIONS = {
+  createDateAsc: {
+    mongo: { 'time.started': 1 },
+    dropdown: { id: 'createDateAsc', name: 'Creation Date (increasing)' },
+  },
+  createDateDesc: {
+    mongo: { 'time.started': -1 },
+    dropdown: { id: 'createDateDesc', name: 'Creation Date (decreasing)' },
+  },
+  durationAsc: {
+    mongo: { 'time.duration': 1 },
+    dropdown: { id: 'durationAsc', name: 'Duration (increasing)' },
+  },
+  durationDesc: {
+    mongo: { 'time.duration': -1 },
+    dropdown: { id: 'durationDesc', name: 'Duration (decreasing)' },
+  },
+  trafficAsc: {
+    mongo: { 'traffic.total': 1 },
+    dropdown: { id: 'trafficAsc', name: 'Traffic (increasing)' },
+  },
+  trafficDesc: {
+    mongo: { 'traffic.total': -1 },
+    dropdown: { id: 'trafficDesc', name: 'Traffic (decreasing)' },
+  },
+};
+
+const DEFAULT_SORT_KEY = Object.keys(SORT_OPTIONS)[0];
+
 module.exports = {
   CLEAR_INTERVAL,
   DEFAULT_SAVE_INTERVAL,
@@ -24,4 +53,6 @@ module.exports = {
   SAVE_REQUEST_LOGS,
   SAVE_DATA_LOG_LEVELS,
   DEFAULT_AUTH,
+  DEFAULT_SORT_KEY,
+  SORT_OPTIONS,
 };

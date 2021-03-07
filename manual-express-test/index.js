@@ -66,4 +66,4 @@ app.get('/test', (req, res) => {
   res.send('success');
 });
 
-app.listen(3000, () => log.success('test app listening'))
+app.listen(3000, () => log.success('test app listening'));

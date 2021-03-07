@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const AbstractTransport = require('../abstractTransport');
+const { SORT_OPTIONS } = require('../abstractTransport/constants');
 const { DB_OPTIONS } = require('./constants');
 const logger = require('../../../utils/logger');
 
@@ -71,6 +72,40 @@ class MongoTransport extends AbstractTransport {
     if (!pathLikeMongo) {
       throw new Error('Invalid path');
     }
+  }
+
+  async _getLogs(
+    { method, path, code },
+    { pageIndex, pageSize },
+    sort,
+  ) {
+    const query = {};
+
+    if (method.length) {
+      query['request.method'] = { $in: method };
+    }
+    if (path.length) {
+      query['request.path'] = { $in: path };
+    }
+    if (code.length) {
+      query['response.code'] = { $in: code };
+    }
+
+    const skip = pageIndex * pageSize;
+
+    const logs = await this._requestLog
+      .find(query)
+      .sort(SORT_OPTIONS[sort].mongo)
+      .skip(skip)
+      .limit(pageSize + 1)
+      .lean();
+
+    const nextPageExists = logs.length > pageSize;
+    if (nextPageExists) {
+      logs.pop();
+    }
+
+    return { result: logs, nextPageExists };
   }
 }
 

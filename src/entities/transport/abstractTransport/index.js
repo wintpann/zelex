@@ -8,6 +8,7 @@ const {
   typeCheck,
 } = require('../../../validation/typeCheck');
 const logger = require('../../../utils/logger');
+const { mapDropdownValue } = require('../../../helpers/serve');
 const {
   CLEAR_INTERVAL,
   DEFAULT_SAVE_INTERVAL,
@@ -15,6 +16,8 @@ const {
   SAVE_REQUEST_LOGS,
   SAVE_DATA_LOG_LEVELS,
   DEFAULT_AUTH,
+  SORT_OPTIONS,
+  DEFAULT_SORT_KEY,
 } = require('./constants');
 
 class AbstractTransport {
@@ -49,6 +52,13 @@ class AbstractTransport {
     this._setIntervals();
 
     this._saveDataLogFlag = this._saveDataLogLevels.reduce((acc, i) => acc | i, 0);
+
+    this._filterOptions = {
+      method: new Set(),
+      path: new Set(),
+      code: new Set(),
+    };
+    this._sortOptions = SORT_OPTIONS;
   }
 
   _validateAbstractTransportInit() {
@@ -99,6 +109,22 @@ class AbstractTransport {
     this._timers = { save, clear };
   }
 
+  _appendFilterOptions(requestLog) {
+    if (!this._canServe) {
+      return;
+    }
+
+    const {
+      request: { method, path },
+      response: { code },
+    } = requestLog;
+
+    this._filterOptions.path.add(path);
+    this._filterOptions.method.add(method);
+    this._filterOptions.code.add(code);
+    // TODO send new options via socket
+  }
+
   // implement in children
   _uploadRequestLogs() {
   }
@@ -115,9 +141,13 @@ class AbstractTransport {
   _checkServeOptions() {
   }
 
+  _getLogs() {
+  }
+
   // public
   collectRequestLog(log) {
     if (this._saveRequestLogs) {
+      this._appendFilterOptions(log);
       this._requestLogs.push(log);
     }
   }
@@ -127,6 +157,37 @@ class AbstractTransport {
     if (shouldSave) {
       this._dataLogs.push(log);
     }
+  }
+
+  getFilterSortOptions() {
+    const path = [...this._filterOptions.path].map(mapDropdownValue);
+    const code = [...this._filterOptions.code].map(mapDropdownValue);
+    const method = [...this._filterOptions.method].map(mapDropdownValue);
+
+    const sort = Object.values(this._sortOptions).map(({ dropdown }) => dropdown);
+
+    const options = {
+      filter: {
+        path,
+        code,
+        method,
+      },
+      sort,
+    };
+    return options;
+  }
+
+  async getLogs(filter = {}, pagination = {}, sort = DEFAULT_SORT_KEY) {
+    const {
+      method = [],
+      path = [],
+      code = [],
+    } = filter;
+    const {
+      pageIndex = 0,
+      pageSize = 10,
+    } = pagination;
+    return this._getLogs({ method, path, code }, { pageIndex, pageSize }, sort);
   }
 }
 
