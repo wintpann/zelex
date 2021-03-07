@@ -4,7 +4,7 @@ class Collector {
   constructor({
     transports,
     extras,
-  }) {
+  } = {}) {
     this._transports = transports;
     this._extras = extras;
   }

@@ -9,7 +9,6 @@ const {
   shape,
   number,
   date,
-  bool,
   string,
   optional,
   arrayOf,

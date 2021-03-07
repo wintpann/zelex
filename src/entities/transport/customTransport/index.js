@@ -8,7 +8,7 @@ class CustomTransport extends AbstractTransport {
     onRequestLog = noop,
     saveDataLogLevels,
     saveRequestLogs,
-  }) {
+  } = {}) {
     super({
       path: 'we dont need path for custom transport',
       saveRequestLogs,
