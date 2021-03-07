@@ -1,3 +1,4 @@
+const express = require('express');
 const {
   shape,
   func,
@@ -6,6 +7,7 @@ const {
 const AbstractTransport = require('../transport/abstractTransport');
 const Interceptor = require('../interceptor');
 const Collector = require('../collector');
+const Server = require('../server');
 
 class Logger {
   constructor({
@@ -20,6 +22,8 @@ class Logger {
     this._validateLoggerInit();
     this._validateTransports();
 
+    this._app.use(express.json());
+
     this._interceptor = new Interceptor();
     this._interceptor.watch = this._interceptor.watch.bind(this._interceptor);
 
@@ -31,6 +35,12 @@ class Logger {
     this._interceptor.onEvery((raw) => {
       this._collector.collect(raw);
     });
+
+    this._server = new Server({
+      app: this._app,
+      transports: this._transports,
+    });
+    this._server.start();
   }
 
   watch(req, res, next) {

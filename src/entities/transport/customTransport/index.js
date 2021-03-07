@@ -1,6 +1,5 @@
 const AbstractTransport = require('../abstractTransport');
 const { noop } = require('../../../helpers/common');
-const logger = require('../../../utils/logger');
 
 class CustomTransport extends AbstractTransport {
   constructor({
@@ -24,13 +23,6 @@ class CustomTransport extends AbstractTransport {
     const { save, clear } = this._timers;
     clearInterval(save);
     clearInterval(clear);
-  }
-
-  _checkServeOptions() {
-    const serveURLPassed = Boolean(this._serveURL);
-    if (serveURLPassed) {
-      logger.warn('You passed serveURL to transport that cannot serve');
-    }
   }
 
   collectRequestLog(log) {

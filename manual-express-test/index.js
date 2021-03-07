@@ -26,6 +26,7 @@ const jsonTransport = new Transport.JSON({
   saveInterval: 1000 * 5,
   clearAfter: 1000 * 60 * 5,
   checkToClearInterval: 1000 * 60,
+  // serveURL: 'json',
 });
 
 const mongoTransport = new Transport.Mongo({
@@ -33,6 +34,7 @@ const mongoTransport = new Transport.Mongo({
   saveInterval: 1000 * 10,
   clearAfter: 1000 * 60 * 5,
   checkToClearInterval: 1000 * 60,
+  serveURL: '/mongo',
 });
 
 const logger = createLogger({
