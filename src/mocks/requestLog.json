@@ -24,7 +24,7 @@
     "headers": {
       "content-type": "application/json"
     },
-    "ip": "localhost",
+    "ip": "176.59.71.118",
     "path": "super/secret/data",
     "method": "PUT",
     "params": {},

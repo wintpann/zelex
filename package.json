@@ -15,8 +15,10 @@
   "author": "wintpann",
   "license": "MIT",
   "scripts": {
-    "request": "curl localhost:3000/test",
-    "go": "node manual-express-test",
+    "get": "curl localhost:3000/get",
+    "post": "curl -X POST localhost:3000/post",
+    "go": "node go-test",
+    "seed": "node go-test/seeds",
     "test": "mocha src/**/__test__/*.js --exit",
     "precommit": "yarn lint-staged && yarn test"
   },

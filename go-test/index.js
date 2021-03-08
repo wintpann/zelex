@@ -3,10 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const log = require('../src/utils/logger');
 
-const JSON_LOGS_TEST = 'JSON_LOGS_TEST';
+const JSON_GO_TEST = 'JSON_GO_TEST';
 
-if (!fs.existsSync(JSON_LOGS_TEST)) {
-  fs.mkdirSync(JSON_LOGS_TEST);
+if (!fs.existsSync(JSON_GO_TEST)) {
+  fs.mkdirSync(JSON_GO_TEST);
 }
 
 const { createLogger, Transport } = require('../src/index');
@@ -21,16 +21,16 @@ const customTransport = new Transport.Custom({
 });
 
 const jsonTransport = new Transport.JSON({
-  path: 'JSON_LOGS_TEST',
-  saveInterval: '5s',
+  path: 'JSON_GO_TEST',
+  saveInterval: '1m',
   clearAfter: '5d',
   checkToClearInterval: '1d',
   serveURL: '/json',
 });
 
 const mongoTransport = new Transport.Mongo({
-  path: 'mongodb://localhost:27017/zelex-manual-test',
-  saveInterval: '5s',
+  path: 'mongodb://localhost:27017/zelex-go-test',
+  saveInterval: '1m',
   clearAfter: '5d',
   checkToClearInterval: '1d',
   serveURL: '/mongo',
@@ -40,7 +40,7 @@ const logger = createLogger({
   app,
   transport: [
     customTransport,
-    // jsonTransport,
+    jsonTransport,
     mongoTransport,
   ],
   extras: {
@@ -50,7 +50,7 @@ const logger = createLogger({
 
 app.use('*', logger.watch);
 
-app.get('/test', (req, res) => {
+app.get('/get', (req, res) => {
   req.user = 'new user';
   req.zx.info({
     step: 'info',
@@ -58,25 +58,18 @@ app.get('/test', (req, res) => {
     description: 'info',
     data: { info: 'info' },
   });
-  req.zx.warn({
-    step: 'warn',
-    name: 'warn',
-    description: 'warn',
-    data: { warn: 'warn' },
-  });
   res.send('success');
 });
 
-setTimeout(() => {
-  logger.info({
-    step: 'info', name: 'info', description: 'info', data: { random: Math.random() },
+app.post('/post', (req, res) => {
+  req.user = 'new user';
+  req.zx.info({
+    step: 'info',
+    name: 'info',
+    description: 'info',
+    data: { info: 'info' },
   });
-  logger.fatal({
-    step: 'fatal', name: 'fatal', description: 'fatal', data: { random: Math.random() },
-  });
-  logger.debug({
-    step: 'debug', name: 'debug', description: 'debug', data: { random: Math.random() },
-  });
-}, 1000 * 5);
+  res.send('success');
+});
 
 app.listen(3000, () => log.success('test app listening'));
