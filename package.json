@@ -1,8 +1,8 @@
 {
   "name": "zelex",
   "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "NodeJs express logger",
+  "main": "src/index.js",
   "keywords": [
     "node",
     "nodejs",
@@ -13,7 +13,17 @@
     "request"
   ],
   "author": "wintpann",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wintpann/zelex.git"
+  },
+  "homepage": "https://github.com/wintpann/zelex",
+  "bugs": {
+    "url": "https://github.com/wintpann/zelex/issues",
+    "email": "vvintpann@gmail.com"
+  },
   "license": "MIT",
+  "private": false,
   "scripts": {
     "get": "curl localhost:3000/get",
     "post": "curl -X POST localhost:3000/post",
