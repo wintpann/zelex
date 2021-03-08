@@ -25,6 +25,7 @@ const {
   DATA_SORT_OPTIONS,
   DEFAULT_DATA_SORT_KEY,
 } = require('./constants');
+const geoClients = require('../../../api/geoClients');
 
 class AbstractTransport {
   constructor({
@@ -72,6 +73,8 @@ class AbstractTransport {
       name: new Set(),
     };
     this._dataSortOptions = DATA_SORT_OPTIONS;
+
+    this._geoClient = geoClients.free;
   }
 
   _validateAbstractTransportInit() {
@@ -180,6 +183,9 @@ class AbstractTransport {
   _scanNewDataOptions() {
   }
 
+  _saveGeo() {
+  }
+
   // public
   collectRequestLog(log) {
     if (this._saveRequestLogs) {
@@ -242,6 +248,33 @@ class AbstractTransport {
 
   async getDataLogs(filter, pagination, sort = DEFAULT_DATA_SORT_KEY) {
     return this._getDataLogs(filter, pagination, sort);
+  }
+
+  _formatGeo(res) {
+    const geo = {
+      location: {
+        latitude: res.latitude,
+        longitude: res.longitude,
+      },
+      city: res.city,
+      region: res.region_name,
+    };
+    return geo;
+  }
+
+  async getGeo(id, ip) {
+    const { res, err: apiErr } = await this._geoClient.getGeo(ip);
+    let geo;
+    let saveErr;
+    if (res) {
+      geo = this._formatGeo(res);
+      const saved = await this._saveGeo(id, geo);
+      saveErr = saved.err;
+    }
+    if (apiErr || saveErr) {
+      logger.error('could not get geo', apiErr || saveErr);
+    }
+    return { geo, apiErr, saveErr };
   }
 }
 

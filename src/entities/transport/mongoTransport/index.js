@@ -201,6 +201,16 @@ class MongoTransport extends AbstractTransport {
 
     return { result: logs, nextPageExists };
   }
+
+  async _saveGeo(id, geo) {
+    try {
+      await this._requestLog.findByIdAndUpdate(id, { $set: { geo } });
+      return { err: null };
+    } catch (err) {
+      logger.error('could not update geo info', err);
+      return { err };
+    }
+  }
 }
 
 module.exports = MongoTransport;

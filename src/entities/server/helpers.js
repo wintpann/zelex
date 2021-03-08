@@ -110,7 +110,31 @@ const getParamsForDataLogs = (req) => {
   return [filter, pagination, getSort(sort, availableDataSorts)];
 };
 
+const notifyError = (text) => ({
+  notify: {
+    type: 'error',
+    text,
+  },
+});
+
+const notifySuccess = (text) => ({
+  notify: {
+    type: 'success',
+    text,
+  },
+});
+
+const notifyInfo = (text) => ({
+  notify: {
+    type: 'info',
+    text,
+  },
+});
+
 module.exports = {
   getParamsForRequestLogs,
   getParamsForDataLogs,
+  notifyError,
+  notifySuccess,
+  notifyInfo,
 };

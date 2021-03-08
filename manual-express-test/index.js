@@ -23,16 +23,16 @@ const customTransport = new Transport.Custom({
 const jsonTransport = new Transport.JSON({
   path: 'JSON_LOGS_TEST',
   saveInterval: '5s',
-  clearAfter: '5m',
-  checkToClearInterval: '1s',
+  clearAfter: '5d',
+  checkToClearInterval: '1d',
   serveURL: '/json',
 });
 
 const mongoTransport = new Transport.Mongo({
   path: 'mongodb://localhost:27017/zelex-manual-test',
   saveInterval: '5s',
-  clearAfter: '5m',
-  checkToClearInterval: '1s',
+  clearAfter: '5d',
+  checkToClearInterval: '1d',
   serveURL: '/mongo',
 });
 
@@ -40,7 +40,7 @@ const logger = createLogger({
   app,
   transport: [
     customTransport,
-    jsonTransport,
+    // jsonTransport,
     mongoTransport,
   ],
   extras: {

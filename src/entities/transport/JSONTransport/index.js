@@ -3,7 +3,7 @@ const AbstractTransport = require('../abstractTransport');
 const { REQ_SORT_OPTIONS, DATA_SORT_OPTIONS } = require('../abstractTransport/constants');
 const logger = require('../../../utils/logger');
 const { randomNumberString } = require('../../../helpers/common');
-const { readdir, readFile } = require('../../../helpers/promisified');
+const { readdir, readFile, writeFile } = require('../../../helpers/promisified');
 const { last, first } = require('../../../helpers/common');
 const {
   getLogBuffer,
@@ -50,10 +50,11 @@ class JSONTransport extends AbstractTransport {
   async _writeLogs(folder, logs) {
     const createFiles = logs.map((log) => new Promise((resolve) => {
       const time = log.time.started || log.time;
-      const fileName = `${this._path}/${folder}/${time}${SEPARATOR}${randomNumberString()}${EXTENSION}`;
-      const buffer = getLogBuffer(log);
+      const fileName = `${time}${SEPARATOR}${randomNumberString()}${EXTENSION}`;
+      const filePath = `${this._path}/${folder}/${fileName}`;
+      const buffer = getLogBuffer({ _id: fileName, ...log });
 
-      fs.writeFile(fileName, buffer, (err) => {
+      fs.writeFile(filePath, buffer, (err) => {
         if (err) {
           logger.error('could not write log', err);
         }
@@ -261,6 +262,21 @@ class JSONTransport extends AbstractTransport {
       logs.pop();
     }
     return { result: logs, nextPageExists };
+  }
+
+  async _saveGeo(id, geo) {
+    const path = `${this._requestPath}/${id}`;
+    try {
+      let log = await readFile(path, { encoding: 'utf-8' });
+      log = JSON.parse(log);
+      log.geo = geo;
+      const buffer = getLogBuffer(log);
+      await writeFile(path, buffer);
+      return { err: null };
+    } catch (err) {
+      logger.error('could not update geo info', err);
+      return { err };
+    }
   }
 }
 

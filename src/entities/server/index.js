@@ -1,6 +1,7 @@
 const {
   getParamsForRequestLogs,
   getParamsForDataLogs,
+  notifyError,
 } = require('./helpers');
 const { EMPTY_LOG_RESULT } = require('./constants');
 const logger = require('../../utils/logger');
@@ -24,11 +25,15 @@ class Server {
       const requestOptionsURL = `${_serveURL}/options/request`;
       const dataOptionsURL = `${_serveURL}/options/data`;
 
+      const geoURL = `${_serveURL}/geo`;
+
       this._app.get(requestLogsURL, this._serveRequestLogs(transport));
       this._app.get(dataLogsURL, this._serveDataLogs(transport));
 
       this._app.get(requestOptionsURL, this._serveRequestOptions(transport));
       this._app.get(dataOptionsURL, this._serveDataOptions(transport));
+
+      this._app.post(geoURL, this._serveGeo(transport));
     });
   }
 
@@ -40,7 +45,7 @@ class Server {
         res.json(result);
       } catch (e) {
         logger.error('could not serve logs', e);
-        res.json(EMPTY_LOG_RESULT);
+        res.json({ ...EMPTY_LOG_RESULT, ...notifyError('Could not get request logs. Try one more time') });
       }
     };
     return handler;
@@ -74,6 +79,21 @@ class Server {
       const { scanForNew } = req.query;
       const options = await transport.getDataOptions(scanForNew);
       res.json(options);
+    };
+    return handler;
+  }
+
+  _serveGeo(transport) {
+    const handler = async (req, res) => {
+      const { ip, id } = req.body;
+      const { geo, apiErr, saveErr } = await transport.getGeo(id, ip);
+      if (apiErr) {
+        res.json({ geo: null, ...notifyError('Could not get geo. Try one more time or check request ip') });
+      } else if (saveErr) {
+        res.json({ geo, ...notifyError('Could not save geo') });
+      } else {
+        res.json({ geo });
+      }
     };
     return handler;
   }
