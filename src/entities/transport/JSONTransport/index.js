@@ -79,7 +79,7 @@ class JSONTransport extends AbstractTransport {
 
       const now = new Date();
       const diff = now - logCreateTime;
-      const shouldDelete = diff > this._clearAfter;
+      const shouldDelete = diff > this._clearAfterMs;
 
       return shouldDelete;
     });

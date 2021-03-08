@@ -1,4 +1,10 @@
 const crypto = require('crypto');
+const {
+  SECOND,
+  MINUTE,
+  HOUR,
+  DAY,
+} = require('../config/constants');
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -35,6 +41,44 @@ const dig = (object = {}, path = '', defaultValue = '--') => {
   return stepValue || defaultValue;
 };
 
+const getSegmentUnit = (segment) => {
+  if (segment.endsWith('s')) {
+    return SECOND;
+  }
+  if (segment.endsWith('m')) {
+    return MINUTE;
+  }
+  if (segment.endsWith('h')) {
+    return HOUR;
+  }
+  if (segment.endsWith('d')) {
+    return DAY;
+  }
+  return 1;
+};
+
+const getTimeMs = (time) => {
+  const isNumber = typeof time === 'number' && !Number.isNaN(time);
+  if (isNumber) {
+    return time;
+  }
+
+  const invalidTime = typeof time !== 'string';
+  if (invalidTime) {
+    return 0;
+  }
+
+  const segments = time.split(',');
+  const result = segments.reduce((acc, segment) => {
+    const segmentNumber = parseInt(segment, 10);
+    const segmentUnit = getSegmentUnit(segment);
+
+    const timePart = segmentUnit * segmentNumber;
+    return acc + timePart;
+  }, 0);
+  return result;
+};
+
 module.exports = {
   delay,
   last,
@@ -44,4 +88,5 @@ module.exports = {
   randomNumberString,
   randomNumberInclusive,
   dig,
+  getTimeMs,
 };

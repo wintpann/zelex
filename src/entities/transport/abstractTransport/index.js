@@ -3,6 +3,7 @@ const {
   string,
   bool,
   func,
+  oneOf,
   number,
   arrayOf,
   typeCheck,
@@ -11,6 +12,7 @@ const logger = require('../../../utils/logger');
 const { LEVEL_HUMANIZED } = require('../../../config/constants');
 const { LEVEL } = require('../../../config/constants');
 const { mapDropdownValue } = require('../../../helpers/serve');
+const { getTimeMs } = require('../../../helpers/common');
 const {
   CLEAR_INTERVAL,
   DEFAULT_SAVE_INTERVAL,
@@ -42,9 +44,9 @@ class AbstractTransport {
     this._path = path;
     this._saveInterval = saveInterval;
     this._clearAfter = clearAfter;
+    this._checkToClearInterval = checkToClearInterval;
     this._saveRequestLogs = saveRequestLogs;
     this._saveDataLogLevels = saveDataLogLevels;
-    this._checkToClearInterval = checkToClearInterval;
 
     this._canServe = canServe;
     this._serveURL = serveURL;
@@ -52,6 +54,7 @@ class AbstractTransport {
 
     this._validateAbstractTransportInit();
     this._validatePath();
+    this._getIntervals();
     this._checkServeOptions();
     this._setIntervals();
 
@@ -74,9 +77,9 @@ class AbstractTransport {
   _validateAbstractTransportInit() {
     const validate = typeCheck(
       ['path', this._path, string],
-      ['saveInterval', this._saveInterval, optional(number)],
-      ['clearAfter', this._clearAfter, optional(number)],
-      ['checkToClearInterval', this._checkToClearInterval, optional(number)],
+      ['saveInterval', this._saveInterval, optional(oneOf(number, string))],
+      ['clearAfter', this._clearAfter, optional(oneOf(number, string))],
+      ['checkToClearInterval', this._checkToClearInterval, optional(oneOf(number, string))],
       ['saveRequestLogs', this._saveRequestLogs, optional(bool)],
       ['saveDataLogLevels', this._saveDataLogLevels, optional(arrayOf(number))],
     );
@@ -87,6 +90,12 @@ class AbstractTransport {
       );
     }
     validate.complete('Failed to create transport, check constructor params.');
+  }
+
+  _getIntervals() {
+    this._saveIntervalMs = getTimeMs(this._saveInterval);
+    this._clearAfterMs = getTimeMs(this._clearAfter);
+    this._checkToClearIntervalMs = getTimeMs(this._checkToClearInterval);
   }
 
   async _uploadAllCollectedLogs() {
@@ -114,8 +123,8 @@ class AbstractTransport {
   }
 
   _setIntervals() {
-    const save = setInterval(this._uploadAllCollectedLogs.bind(this), this._saveInterval);
-    const clear = setInterval(this._clearLogs.bind(this), this._checkToClearInterval);
+    const save = setInterval(this._uploadAllCollectedLogs.bind(this), this._saveIntervalMs);
+    const clear = setInterval(this._clearLogs.bind(this), this._checkToClearIntervalMs);
     this._timers = { save, clear };
   }
 
@@ -135,7 +144,6 @@ class AbstractTransport {
     // TODO send new options via socket
     // TODO method for scanning options
     // TODO filter by date
-    // TODO add ms
   }
 
   _appendDataFilterOptions(dataLog) {

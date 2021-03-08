@@ -62,7 +62,7 @@ class MongoTransport extends AbstractTransport {
 
   async _clearSavedLogs() {
     const now = Date.now();
-    const clearLTE = new Date(now - this._clearAfter);
+    const clearLTE = new Date(now - this._clearAfterMs);
     await this._dataLog.deleteMany({ time: { $lte: clearLTE } });
     await this._requestLog.deleteMany({ 'time.started': { $lte: clearLTE } });
   }

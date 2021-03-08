@@ -31,7 +31,7 @@ const date = (value, isOptional) => {
 };
 
 const number = (value, isOptional) => Validator(
-  typeof value !== 'number',
+  typeof value !== 'number' || Number.isNaN(value),
   'number',
   isOptional,
 );
