@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const AbstractTransport = require('../abstractTransport');
-const { SORT_OPTIONS } = require('../abstractTransport/constants');
+const { REQ_SORT_OPTIONS } = require('../abstractTransport/constants');
 const { DB_OPTIONS } = require('./constants');
 const logger = require('../../../utils/logger');
 
@@ -37,7 +37,7 @@ class MongoTransport extends AbstractTransport {
 
     this._connection
       .then(() => logger.success('mongodb connection established'))
-      .catch((e) => logger.error('mongodb connection failed', e.message));
+      .catch((e) => logger.error('mongodb connection failed', e));
 
     this._connection.on('close', () => logger.info('mongodb connection closed'));
 
@@ -74,7 +74,7 @@ class MongoTransport extends AbstractTransport {
     }
   }
 
-  async _getLogs(
+  async _getRequestLogs(
     { method, path, code },
     { pageIndex, pageSize },
     sort,
@@ -95,7 +95,7 @@ class MongoTransport extends AbstractTransport {
 
     const logs = await this._requestLog
       .find(query)
-      .sort(SORT_OPTIONS[sort].mongo)
+      .sort(REQ_SORT_OPTIONS[sort].mongo)
       .skip(skip)
       .limit(pageSize + 1)
       .lean();
@@ -106,6 +106,11 @@ class MongoTransport extends AbstractTransport {
     }
 
     return { result: logs, nextPageExists };
+  }
+
+  async _getDataLogs(
+  ) {
+    return { result: [], nextPageExists: false };
   }
 }
 

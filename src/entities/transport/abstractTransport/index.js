@@ -16,8 +16,8 @@ const {
   SAVE_REQUEST_LOGS,
   SAVE_DATA_LOG_LEVELS,
   DEFAULT_AUTH,
-  SORT_OPTIONS,
-  DEFAULT_SORT_KEY,
+  REQ_SORT_OPTIONS,
+  DEFAULT_REQ_SORT_KEY,
 } = require('./constants');
 
 class AbstractTransport {
@@ -53,12 +53,12 @@ class AbstractTransport {
 
     this._saveDataLogFlag = this._saveDataLogLevels.reduce((acc, i) => acc | i, 0);
 
-    this._filterOptions = {
+    this._reqFilterOptions = {
       method: new Set(),
       path: new Set(),
       code: new Set(),
     };
-    this._sortOptions = SORT_OPTIONS;
+    this._reqSortOptions = REQ_SORT_OPTIONS;
   }
 
   _validateAbstractTransportInit() {
@@ -109,7 +109,7 @@ class AbstractTransport {
     this._timers = { save, clear };
   }
 
-  _appendFilterOptions(requestLog) {
+  _appendReqFilterOptions(requestLog) {
     if (!this._canServe) {
       return;
     }
@@ -119,10 +119,12 @@ class AbstractTransport {
       response: { code },
     } = requestLog;
 
-    this._filterOptions.path.add(path);
-    this._filterOptions.method.add(method);
-    this._filterOptions.code.add(code);
+    this._reqFilterOptions.path.add(path);
+    this._reqFilterOptions.method.add(method);
+    this._reqFilterOptions.code.add(code);
     // TODO send new options via socket
+    // TODO method for scanning options
+    // TODO filter by date
   }
 
   // implement in children
@@ -141,13 +143,13 @@ class AbstractTransport {
   _checkServeOptions() {
   }
 
-  _getLogs() {
+  _getRequestLogs() {
   }
 
   // public
   collectRequestLog(log) {
     if (this._saveRequestLogs) {
-      this._appendFilterOptions(log);
+      this._appendReqFilterOptions(log);
       this._requestLogs.push(log);
     }
   }
@@ -159,12 +161,12 @@ class AbstractTransport {
     }
   }
 
-  getFilterSortOptions() {
-    const path = [...this._filterOptions.path].map(mapDropdownValue);
-    const code = [...this._filterOptions.code].map(mapDropdownValue);
-    const method = [...this._filterOptions.method].map(mapDropdownValue);
+  getRequestOptions() {
+    const path = [...this._reqFilterOptions.path].map(mapDropdownValue);
+    const code = [...this._reqFilterOptions.code].map(mapDropdownValue);
+    const method = [...this._reqFilterOptions.method].map(mapDropdownValue);
 
-    const sort = Object.values(this._sortOptions).map(({ dropdown }) => dropdown);
+    const sort = Object.values(this._reqSortOptions).map(({ dropdown }) => dropdown);
 
     const options = {
       filter: {
@@ -177,7 +179,11 @@ class AbstractTransport {
     return options;
   }
 
-  async getLogs(filter = {}, pagination = {}, sort = DEFAULT_SORT_KEY) {
+  getDataOptions() {
+    return [];
+  }
+
+  async getRequestLogs(filter = {}, pagination = {}, sort = DEFAULT_REQ_SORT_KEY) {
     const {
       method = [],
       path = [],
@@ -187,7 +193,11 @@ class AbstractTransport {
       pageIndex = 0,
       pageSize = 10,
     } = pagination;
-    return this._getLogs({ method, path, code }, { pageIndex, pageSize }, sort);
+    return this._getRequestLogs({ method, path, code }, { pageIndex, pageSize }, sort);
+  }
+
+  async getDataLogs() {
+    return this._getDataLogs();
   }
 }
 

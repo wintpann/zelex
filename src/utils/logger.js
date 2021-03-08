@@ -4,9 +4,14 @@ const info = (...args) => console.log(COLORS.BLUE, '[ZELEX] »:', ...args, COLOR
 
 const success = (...args) => console.log(COLORS.GREEN, '[ZELEX] ✔:', ...args, COLORS.WHITE);
 
-const warn = (...args) => console.warn(COLORS.YELLOW, '[ZELEX] ?:', ...args, COLORS.WHITE);
+const warn = (...args) => console.warn(COLORS.YELLOW, '[ZELEX] ☢:', ...args, COLORS.WHITE);
 
-const error = (...args) => console.error(COLORS.RED, '[ZELEX]: ✖', ...args, COLORS.WHITE);
+const error = (message, err) => console.error(
+  COLORS.RED, '[ZELEX]: ✖',
+  message,
+  { message: err.message, stack: err.stack },
+  COLORS.WHITE,
+);
 
 module.exports = {
   info,

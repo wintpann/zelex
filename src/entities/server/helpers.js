@@ -1,8 +1,8 @@
-const { SORT_OPTIONS } = require('../transport/abstractTransport/constants');
+const { REQ_SORT_OPTIONS } = require('../transport/abstractTransport/constants');
 
-const availableSorts = Object.keys(SORT_OPTIONS);
+const availableRequestSorts = Object.keys(REQ_SORT_OPTIONS);
 
-const getParams = (req) => {
+const getParamsForRequestLogs = (req) => {
   const {
     method = '',
     code = '',
@@ -58,7 +58,7 @@ const getParams = (req) => {
     pagination.pageIndex = pageIndex;
   }
 
-  const invalidSort = !availableSorts.includes(sort);
+  const invalidSort = !availableRequestSorts.includes(sort);
   if (invalidSort) {
     sort = undefined;
   }
@@ -66,4 +66,14 @@ const getParams = (req) => {
   return [filter, pagination, sort];
 };
 
-module.exports = { getParams };
+const getParamsForDataLogs = () => {
+  const filter = {};
+  const pagination = {};
+  const sort = '';
+  return [filter, pagination, sort];
+};
+
+module.exports = {
+  getParamsForRequestLogs,
+  getParamsForDataLogs,
+};

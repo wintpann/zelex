@@ -1,8 +1,9 @@
 const fs = require('fs');
 const AbstractTransport = require('../abstractTransport');
+const { REQ_SORT_OPTIONS } = require('../abstractTransport/constants');
 const logger = require('../../../utils/logger');
 const { randomNumberString } = require('../../../helpers/common');
-const { readdir } = require('../../../helpers/promisified');
+const { readdir, readFile } = require('../../../helpers/promisified');
 const { last, first } = require('../../../helpers/common');
 const { getLogBuffer } = require('./helpers');
 
@@ -110,6 +111,53 @@ class JSONTransport extends AbstractTransport {
     if (!fs.existsSync(this._dataPath)) {
       fs.mkdirSync(this._dataPath, { recursive: true });
     }
+  }
+
+  async _getRequestLogs(
+    { method, path, code },
+    { pageIndex, pageSize },
+    sort,
+  ) {
+    let logs = await readdir(this._requestPath);
+
+    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}`, { encoding: 'utf-8' }));
+
+    logs = await Promise.all(logs);
+
+    logs = logs.map((log) => JSON.parse(log));
+
+    logs = logs.filter((log, index) => {
+      const paginationRangeMin = pageIndex * pageSize;
+      const paginationRangeMax = paginationRangeMin + pageSize + 1;
+      const notInRange = index < paginationRangeMin || index > paginationRangeMax;
+      if (notInRange) {
+        return false;
+      }
+
+      if (method.length && !method.includes(log.request.method)) {
+        return false;
+      }
+      if (path.length && !path.includes(log.request.path)) {
+        return false;
+      }
+      if (code.length && !code.includes(log.response.code)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    logs.sort(REQ_SORT_OPTIONS[sort].json);
+    const nextPageExists = logs.length > pageSize;
+    if (nextPageExists) {
+      logs.pop();
+    }
+    return { result: logs, nextPageExists };
+  }
+
+  async _getDataLogs(
+  ) {
+    return { result: [], nextPageExists: false };
   }
 }
 

@@ -82,7 +82,7 @@ const getRequestLog = (raw, extras) => {
     log.extra = getExtraInfo(raw, extras);
     log.dataLogs = getDataLogs(raw);
   } catch (e) {
-    logger.error('failed to pull request log', e.message);
+    logger.error('failed to pull request log', e);
   }
   return log;
 };

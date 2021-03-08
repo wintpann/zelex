@@ -35,7 +35,7 @@ const createDataLog = (req, level) => ({
 
     req[ZX_PRIVATE].dataLogs.push(log);
   } catch (e) {
-    logger.error(e.message);
+    logger.error('could not create data log', e);
   }
 };
 

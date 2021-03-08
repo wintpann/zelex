@@ -26,7 +26,7 @@ const jsonTransport = new Transport.JSON({
   saveInterval: 1000 * 5,
   clearAfter: 1000 * 60 * 5,
   checkToClearInterval: 1000 * 60,
-  // serveURL: 'json',
+  serveURL: '/json',
 });
 
 const mongoTransport = new Transport.Mongo({
