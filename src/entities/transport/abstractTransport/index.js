@@ -54,7 +54,7 @@ class AbstractTransport {
 
     this._validateAbstractTransportInit();
     this._validatePath();
-    this._getIntervals();
+    this._getIntervalsInMs();
     this._checkServeOptions();
     this._setIntervals();
 
@@ -92,7 +92,7 @@ class AbstractTransport {
     validate.complete('Failed to create transport, check constructor params.');
   }
 
-  _getIntervals() {
+  _getIntervalsInMs() {
     this._saveIntervalMs = getTimeMs(this._saveInterval);
     this._clearAfterMs = getTimeMs(this._clearAfter);
     this._checkToClearIntervalMs = getTimeMs(this._checkToClearInterval);
@@ -141,7 +141,6 @@ class AbstractTransport {
     this._reqFilterOptions.path.add(path);
     this._reqFilterOptions.method.add(method);
     this._reqFilterOptions.code.add(code);
-    // TODO refactor
   }
 
   _appendDataFilterOptions(dataLog) {
@@ -237,37 +236,12 @@ class AbstractTransport {
     return options;
   }
 
-  async getRequestLogs(filter = {}, pagination = {}, sort = DEFAULT_REQ_SORT_KEY) {
-    const {
-      method = [],
-      path = [],
-      code = [],
-      dateFrom = '',
-      dateTo = '',
-    } = filter;
-    const {
-      pageIndex = 0,
-      pageSize = 10,
-    } = pagination;
-    return this._getRequestLogs({
-      method, path, code, dateFrom, dateTo,
-    }, { pageIndex, pageSize }, sort);
+  async getRequestLogs(filter, pagination, sort = DEFAULT_REQ_SORT_KEY) {
+    return this._getRequestLogs(filter, pagination, sort);
   }
 
-  async getDataLogs(filter = {}, pagination = {}, sort = DEFAULT_DATA_SORT_KEY) {
-    const {
-      level = [],
-      name = [],
-      dateFrom = '',
-      dateTo = '',
-    } = filter;
-    const {
-      pageIndex = 0,
-      pageSize = 10,
-    } = pagination;
-    return this._getDataLogs({
-      name, level, dateFrom, dateTo,
-    }, { pageIndex, pageSize }, sort);
+  async getDataLogs(filter, pagination, sort = DEFAULT_DATA_SORT_KEY) {
+    return this._getDataLogs(filter, pagination, sort);
   }
 }
 

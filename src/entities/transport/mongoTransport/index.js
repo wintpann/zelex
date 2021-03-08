@@ -103,7 +103,10 @@ class MongoTransport extends AbstractTransport {
       dateFrom,
       dateTo,
     },
-    { pageIndex, pageSize },
+    {
+      pageIndex,
+      pageSize,
+    },
     sort,
   ) {
     const query = {};
@@ -150,9 +153,15 @@ class MongoTransport extends AbstractTransport {
 
   async _getDataLogs(
     {
-      name, level, dateFrom, dateTo,
+      name,
+      level,
+      dateFrom,
+      dateTo,
     },
-    { pageIndex, pageSize },
+    {
+      pageIndex,
+      pageSize,
+    },
     sort,
   ) {
     const query = {};

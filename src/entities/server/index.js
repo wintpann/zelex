@@ -1,4 +1,7 @@
-const { getParamsForRequestLogs, getParamsForDataLogs } = require('./helpers');
+const {
+  getParamsForRequestLogs,
+  getParamsForDataLogs,
+} = require('./helpers');
 const { EMPTY_LOG_RESULT } = require('./constants');
 const logger = require('../../utils/logger');
 

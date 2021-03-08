@@ -1,71 +1,33 @@
-const { REQ_SORT_OPTIONS } = require('../transport/abstractTransport/constants');
+const {
+  REQ_SORT_OPTIONS,
+  DEFAULT_PAGINATION,
+  DATA_SORT_OPTIONS,
+} = require('../transport/abstractTransport/constants');
 const { isValidDate } = require('../../helpers/common');
 
 const availableRequestSorts = Object.keys(REQ_SORT_OPTIONS);
+const availableDataSorts = Object.keys(DATA_SORT_OPTIONS);
 
-const getParamsForRequestLogs = (req) => {
-  const {
-    method = '',
-    code = '',
-    path = '',
-  } = req.query;
-
-  let {
-    pageSize = '',
-    pageIndex = '',
-    sort = '',
-    dateFrom = '',
-    dateTo = '',
-  } = req.query;
-
-  const filter = {
-    method: [],
-    code: [],
-    path: [],
-    dateFrom: '',
-    dateTo: '',
-  };
-  const pagination = {
-    pageSize: 10,
-    pageIndex: 0,
-  };
-
-  method.split(',').forEach((item) => {
-    if (item) {
-      filter.method.push(item.toUpperCase());
+const getQueryOptions = (
+  value,
+  isValidItemFn = Boolean,
+  mapFn,
+) => {
+  const options = [];
+  String(value).split(',').forEach((item) => {
+    const isValid = isValidItemFn(item);
+    if (isValid) {
+      options.push(mapFn ? mapFn(item) : item);
     }
   });
+  return options;
+};
 
-  code.split(',').forEach((item) => {
-    const num = parseInt(item, 10);
-    const isValidCode = !Number.isNaN(num);
-    if (isValidCode) {
-      filter.code.push(num);
-    }
-  });
+const getPagination = (size, index) => {
+  const pagination = { ...DEFAULT_PAGINATION };
 
-  path.split(',').forEach((item) => {
-    if (item) {
-      filter.path.push(item);
-    }
-  });
-
-  dateFrom = Number(dateFrom);
-  dateTo = Number(dateTo);
-
-  const validDateFrom = isValidDate(dateFrom);
-  const validDateTo = isValidDate(dateTo);
-
-  if (validDateFrom) {
-    filter.dateFrom = dateFrom;
-  }
-
-  if (validDateTo) {
-    filter.dateTo = dateTo;
-  }
-
-  pageSize = parseInt(pageSize, 10);
-  pageIndex = parseInt(pageIndex, 10);
+  const pageSize = parseInt(size, 10);
+  const pageIndex = parseInt(index, 10);
 
   const isValidPageSize = typeof pageSize === 'number' && pageSize > 0;
   const isValidPageIndex = typeof pageSize === 'number' && pageSize >= 0;
@@ -77,84 +39,75 @@ const getParamsForRequestLogs = (req) => {
     pagination.pageIndex = pageIndex;
   }
 
-  const invalidSort = !availableRequestSorts.includes(sort);
-  if (invalidSort) {
-    sort = undefined;
-  }
+  return pagination;
+};
 
-  return [filter, pagination, sort];
+const getDate = (value) => {
+  const date = Number(value);
+  const validDate = isValidDate(date);
+  return validDate ? date : undefined;
+};
+
+const getSort = (value, availableOptions) => {
+  const validSort = availableOptions.includes(value);
+  return validSort ? value : undefined;
+};
+
+const getParamsForRequestLogs = (req) => {
+  const {
+    method,
+    code,
+    path,
+    pageSize,
+    pageIndex,
+    dateFrom,
+    dateTo,
+    sort,
+  } = req.query;
+
+  const filter = {
+    method: getQueryOptions(
+      method,
+      undefined,
+      (item) => item.toUpperCase(),
+    ),
+    code: getQueryOptions(
+      code,
+      (item) => {
+        const num = parseInt(item, 10);
+        const isValidCode = !Number.isNaN(num);
+        return isValidCode;
+      },
+    ),
+    path: getQueryOptions(path),
+    dateFrom: getDate(dateFrom),
+    dateTo: getDate(dateTo),
+  };
+  const pagination = getPagination(pageSize, pageIndex);
+
+  return [filter, pagination, getSort(sort, availableRequestSorts)];
 };
 
 const getParamsForDataLogs = (req) => {
   const {
-    level = '',
-    name = '',
-  } = req.query;
-
-  let {
-    pageSize = '',
-    pageIndex = '',
-    sort = '',
-    dateFrom = '',
-    dateTo = '',
+    level,
+    name,
+    pageSize,
+    pageIndex,
+    dateFrom,
+    dateTo,
+    sort,
   } = req.query;
 
   const filter = {
-    level: [],
-    name: [],
-    dateFrom: '',
-    dateTo: '',
+    level: getQueryOptions(level),
+    name: getQueryOptions(name),
+    dateFrom: getDate(dateFrom),
+    dateTo: getDate(dateTo),
   };
-  const pagination = {
-    pageSize: 10,
-    pageIndex: 0,
-  };
+  const pagination = getPagination(pageSize, pageIndex);
 
-  level.split(',').forEach((item) => {
-    if (item) {
-      filter.level.push(item);
-    }
-  });
-
-  name.split(',').forEach((item) => {
-    if (item) {
-      filter.name.push(item);
-    }
-  });
-
-  dateFrom = Number(dateFrom);
-  dateTo = Number(dateTo);
-
-  const validDateFrom = isValidDate(dateFrom);
-  const validDateTo = isValidDate(dateTo);
-
-  if (validDateFrom) {
-    filter.dateFrom = dateFrom;
-  }
-
-  if (validDateTo) {
-    filter.dateTo = dateTo;
-  }
-
-  pageSize = parseInt(pageSize, 10);
-  pageIndex = parseInt(pageIndex, 10);
-
-  const isValidPageSize = typeof pageSize === 'number' && pageSize > 0;
-  const isValidPageIndex = typeof pageSize === 'number' && pageSize >= 0;
-
-  if (isValidPageSize) {
-    pagination.pageSize = pageSize;
-  }
-  if (isValidPageIndex) {
-    pagination.pageIndex = pageIndex;
-  }
-
-  const invalidSort = !availableRequestSorts.includes(sort);
-  if (invalidSort) {
-    sort = undefined;
-  }
-
-  return [filter, pagination, sort];
+  return [filter, pagination, getSort(sort, availableDataSorts)];
 };
 
 module.exports = {

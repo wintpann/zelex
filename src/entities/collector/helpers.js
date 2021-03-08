@@ -80,7 +80,7 @@ const getRequestLog = (raw, extras) => {
 
   log.traffic = getTrafficInfo(raw);
   log.time = getTimeInfo(raw);
-  log.geo = getGeoInfo(raw);
+  log.geo = getGeoInfo();
   log.request = getRequestInfo(raw);
   log.response = getResponseInfo(raw);
   log.extra = getExtraInfo(raw, extras);

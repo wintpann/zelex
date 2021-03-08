@@ -5,7 +5,12 @@ const logger = require('../../../utils/logger');
 const { randomNumberString } = require('../../../helpers/common');
 const { readdir, readFile } = require('../../../helpers/promisified');
 const { last, first } = require('../../../helpers/common');
-const { getLogBuffer } = require('./helpers');
+const {
+  getLogBuffer,
+  getNotInPageRange,
+  getNotInDateRange,
+  getNotInOptions,
+} = require('./helpers');
 
 const [REQUEST_FOLDER, DATA_FOLDER] = ['request', 'data'];
 const SEPARATOR = '@';
@@ -66,14 +71,45 @@ class JSONTransport extends AbstractTransport {
     return this._writeLogs(DATA_FOLDER, logs);
   }
 
+  async _getFileNames() {
+    let requestFiles = [];
+    let dataFiles = [];
+
+    try {
+      const requestLogs = await readdir(this._requestPath);
+      const dataLogs = await readdir(this._dataPath);
+
+      requestFiles = requestLogs.map((fileName) => `${this._requestPath}/${fileName}`);
+      dataFiles = dataLogs.map((fileName) => `${this._dataPath}/${fileName}`);
+    } catch (e) {
+      logger.error('could not read logs', e);
+    }
+    return { requestFiles, dataFiles };
+  }
+
+  async _getAllLogs(files) {
+    let logs = files.map((path) => readFile(path, { encoding: 'utf-8' }));
+    logs = await Promise.all(logs);
+    logs = logs.map((log) => JSON.parse(log));
+    return logs;
+  }
+
+  async _getAllRequestLogs() {
+    const { requestFiles } = await this._getFileNames();
+    const logs = await this._getAllLogs(requestFiles);
+    return logs;
+  }
+
+  async _getAllDataLogs() {
+    const { dataFiles } = await this._getFileNames();
+    const logs = await this._getAllLogs(dataFiles);
+    return logs;
+  }
+
   async _clearSavedLogs() {
-    const requestLogs = await readdir(this._requestPath);
-    const dataLogs = await readdir(this._dataPath);
+    const { requestFiles, dataFiles } = await this._getFileNames();
 
-    const requestPaths = requestLogs.map((fileName) => `${this._requestPath}/${fileName}`);
-    const dataPaths = dataLogs.map((fileName) => `${this._dataPath}/${fileName}`);
-
-    const pathsToDelete = [...requestPaths, ...dataPaths].filter((path) => {
+    const pathsToDelete = [...requestFiles, ...dataFiles].filter((path) => {
       const fileName = last(path.split('/'));
       const logCreateTime = new Date(first(fileName.split(SEPARATOR)));
 
@@ -115,13 +151,7 @@ class JSONTransport extends AbstractTransport {
   }
 
   async _scanNewReqOptions() {
-    let logs = await readdir(this._requestPath);
-
-    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}`, { encoding: 'utf-8' }));
-
-    logs = await Promise.all(logs);
-
-    logs = logs.map((log) => JSON.parse(log));
+    const logs = await this._getAllRequestLogs();
     logs.forEach((log) => {
       const {
         response: { code },
@@ -134,13 +164,7 @@ class JSONTransport extends AbstractTransport {
   }
 
   async _scanNewDataOptions() {
-    let logs = await readdir(this._dataPath);
-
-    logs = logs.map((filePath) => readFile(`${this._dataPath}/${filePath}`, { encoding: 'utf-8' }));
-
-    logs = await Promise.all(logs);
-
-    logs = logs.map((log) => JSON.parse(log));
+    const logs = await this._getAllDataLogs();
     logs.forEach((log) => {
       const { name } = log;
       this._dataFilterOptions.name.add(name);
@@ -149,40 +173,37 @@ class JSONTransport extends AbstractTransport {
 
   async _getRequestLogs(
     {
-      method, path, code, dateFrom, dateTo,
+      method,
+      path,
+      code,
+      dateFrom,
+      dateTo,
     },
-    { pageIndex, pageSize },
+    {
+      pageIndex,
+      pageSize,
+    },
     sort,
   ) {
-    let logs = await readdir(this._requestPath);
-
-    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}`, { encoding: 'utf-8' }));
-
-    logs = await Promise.all(logs);
-
-    logs = logs.map((log) => JSON.parse(log));
+    let logs = await this._getAllRequestLogs();
 
     logs = logs.filter((log, index) => {
-      const paginationRangeMin = pageIndex * pageSize;
-      const paginationRangeMax = paginationRangeMin + pageSize + 1;
-      const notInRange = index < paginationRangeMin || index > paginationRangeMax;
-      if (notInRange) {
+      const notInPageRange = getNotInPageRange(index, pageIndex, pageSize);
+      if (notInPageRange) {
         return false;
       }
 
-      if (method.length && !method.includes(log.request.method)) {
+      const notInOptions = getNotInOptions(
+        [method, log.request.method],
+        [path, log.request.path],
+        [code, log.response.code],
+      );
+      if (notInOptions) {
         return false;
       }
-      if (path.length && !path.includes(log.request.path)) {
-        return false;
-      }
-      if (code.length && !code.includes(log.response.code)) {
-        return false;
-      }
-      if (dateFrom && Number(new Date(log.time.started)) < Number(new Date(dateFrom))) {
-        return false;
-      }
-      if (dateTo && Number(new Date(log.time.started)) > Number(new Date(dateTo))) {
+
+      const notInDateRange = getNotInDateRange(dateFrom, dateTo, log.time.started);
+      if (notInDateRange) {
         return false;
       }
 
@@ -199,37 +220,35 @@ class JSONTransport extends AbstractTransport {
 
   async _getDataLogs(
     {
-      name, level, dateFrom, dateTo,
+      name,
+      level,
+      dateFrom,
+      dateTo,
     },
-    { pageIndex, pageSize },
+    {
+      pageIndex,
+      pageSize,
+    },
     sort,
   ) {
-    let logs = await readdir(this._dataPath);
-
-    logs = logs.map((filePath) => readFile(`${this._dataPath}/${filePath}`, { encoding: 'utf-8' }));
-
-    logs = await Promise.all(logs);
-
-    logs = logs.map((log) => JSON.parse(log));
+    let logs = await this._getAllDataLogs();
 
     logs = logs.filter((log, index) => {
-      const paginationRangeMin = pageIndex * pageSize;
-      const paginationRangeMax = paginationRangeMin + pageSize + 1;
-      const notInRange = index < paginationRangeMin || index > paginationRangeMax;
-      if (notInRange) {
+      const notInPageRange = getNotInPageRange(index, pageIndex, pageSize);
+      if (notInPageRange) {
         return false;
       }
 
-      if (name.length && !name.includes(log.name)) {
+      const notInOptions = getNotInOptions(
+        [name, log.name],
+        [level, log.levelHumanized],
+      );
+      if (notInOptions) {
         return false;
       }
-      if (level.length && !level.includes(log.levelHumanized)) {
-        return false;
-      }
-      if (dateFrom && Number(new Date(log.time)) < Number(new Date(dateFrom))) {
-        return false;
-      }
-      if (dateTo && Number(new Date(log.time)) > Number(new Date(dateTo))) {
+
+      const notInDateRange = getNotInDateRange(dateFrom, dateTo, log.time);
+      if (notInDateRange) {
         return false;
       }
 

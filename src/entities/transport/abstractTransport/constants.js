@@ -61,6 +61,11 @@ const DATA_SORT_OPTIONS = {
 const DEFAULT_REQ_SORT_KEY = Object.keys(REQ_SORT_OPTIONS)[0];
 const DEFAULT_DATA_SORT_KEY = Object.keys(DATA_SORT_OPTIONS)[0];
 
+const DEFAULT_PAGINATION = {
+  pageSize: 10,
+  pageIndex: 0,
+};
+
 module.exports = {
   CLEAR_INTERVAL,
   DEFAULT_SAVE_INTERVAL,
@@ -72,4 +77,5 @@ module.exports = {
   DEFAULT_DATA_SORT_KEY,
   REQ_SORT_OPTIONS,
   DATA_SORT_OPTIONS,
+  DEFAULT_PAGINATION,
 };
