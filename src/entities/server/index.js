@@ -58,16 +58,18 @@ class Server {
   }
 
   _serveRequestOptions(transport) {
-    const handler = (req, res) => {
-      const options = transport.getRequestOptions();
+    const handler = async (req, res) => {
+      const { scanForNew } = req.query;
+      const options = await transport.getRequestOptions(scanForNew);
       res.json(options);
     };
     return handler;
   }
 
   _serveDataOptions(transport) {
-    const handler = (req, res) => {
-      const options = transport.getDataOptions();
+    const handler = async (req, res) => {
+      const { scanForNew } = req.query;
+      const options = await transport.getDataOptions(scanForNew);
       res.json(options);
     };
     return handler;

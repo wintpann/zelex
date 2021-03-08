@@ -141,9 +141,6 @@ class AbstractTransport {
     this._reqFilterOptions.path.add(path);
     this._reqFilterOptions.method.add(method);
     this._reqFilterOptions.code.add(code);
-    // TODO send new options via socket
-    // TODO method for scanning options
-    // TODO filter by date
     // TODO refactor
   }
 
@@ -178,6 +175,12 @@ class AbstractTransport {
   _getDataLogs() {
   }
 
+  _scanNewReqOptions() {
+  }
+
+  _scanNewDataOptions() {
+  }
+
   // public
   collectRequestLog(log) {
     if (this._saveRequestLogs) {
@@ -194,7 +197,10 @@ class AbstractTransport {
     }
   }
 
-  getRequestOptions() {
+  async getRequestOptions(scanForNew) {
+    if (scanForNew) {
+      await this._scanNewReqOptions();
+    }
     const path = [...this._reqFilterOptions.path].map(mapDropdownValue);
     const code = [...this._reqFilterOptions.code].map(mapDropdownValue);
     const method = [...this._reqFilterOptions.method].map(mapDropdownValue);
@@ -212,7 +218,10 @@ class AbstractTransport {
     return options;
   }
 
-  getDataOptions() {
+  async getDataOptions(scanForNew) {
+    if (scanForNew) {
+      await this._scanNewDataOptions();
+    }
     const level = [...this._dataFilterOptions.level].map(mapDropdownValue);
     const name = [...this._dataFilterOptions.name].map(mapDropdownValue);
 

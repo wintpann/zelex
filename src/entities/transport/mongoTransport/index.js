@@ -74,6 +74,27 @@ class MongoTransport extends AbstractTransport {
     }
   }
 
+  async _scanNewReqOptions() {
+    const logs = await this._requestLog.find().select('response.code request.path request.method').lean();
+    logs.forEach((log) => {
+      const {
+        response: { code },
+        request: { method, path },
+      } = log;
+      this._reqFilterOptions.code.add(code);
+      this._reqFilterOptions.method.add(method);
+      this._reqFilterOptions.path.add(path);
+    });
+  }
+
+  async _scanNewDataOptions() {
+    const logs = await this._dataLog.find().select('name').lean();
+    logs.forEach((log) => {
+      const { name } = log;
+      this._dataFilterOptions.name.add(name);
+    });
+  }
+
   async _getRequestLogs(
     {
       method,

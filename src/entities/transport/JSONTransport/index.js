@@ -114,6 +114,39 @@ class JSONTransport extends AbstractTransport {
     }
   }
 
+  async _scanNewReqOptions() {
+    let logs = await readdir(this._requestPath);
+
+    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}`, { encoding: 'utf-8' }));
+
+    logs = await Promise.all(logs);
+
+    logs = logs.map((log) => JSON.parse(log));
+    logs.forEach((log) => {
+      const {
+        response: { code },
+        request: { method, path },
+      } = log;
+      this._reqFilterOptions.code.add(code);
+      this._reqFilterOptions.method.add(method);
+      this._reqFilterOptions.path.add(path);
+    });
+  }
+
+  async _scanNewDataOptions() {
+    let logs = await readdir(this._dataPath);
+
+    logs = logs.map((filePath) => readFile(`${this._dataPath}/${filePath}`, { encoding: 'utf-8' }));
+
+    logs = await Promise.all(logs);
+
+    logs = logs.map((log) => JSON.parse(log));
+    logs.forEach((log) => {
+      const { name } = log;
+      this._dataFilterOptions.name.add(name);
+    });
+  }
+
   async _getRequestLogs(
     {
       method, path, code, dateFrom, dateTo,
