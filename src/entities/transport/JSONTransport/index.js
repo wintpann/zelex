@@ -9,6 +9,7 @@ const { getLogBuffer } = require('./helpers');
 
 const [REQUEST_FOLDER, DATA_FOLDER] = ['request', 'data'];
 const SEPARATOR = '@';
+const EXTENSION = '.json';
 
 class JSONTransport extends AbstractTransport {
   constructor({
@@ -44,7 +45,7 @@ class JSONTransport extends AbstractTransport {
   async _writeLogs(folder, logs) {
     const createFiles = logs.map((log) => new Promise((resolve) => {
       const time = log.time.started || log.time;
-      const fileName = `${this._path}/${folder}/${time}${SEPARATOR}${randomNumberString()}`;
+      const fileName = `${this._path}/${folder}/${time}${SEPARATOR}${randomNumberString()}${EXTENSION}`;
       const buffer = getLogBuffer(log);
 
       fs.writeFile(fileName, buffer, (err) => {
@@ -120,7 +121,7 @@ class JSONTransport extends AbstractTransport {
   ) {
     let logs = await readdir(this._requestPath);
 
-    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}`, { encoding: 'utf-8' }));
+    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}${EXTENSION}`, { encoding: 'utf-8' }));
 
     logs = await Promise.all(logs);
 

@@ -19,7 +19,7 @@ describe('Interceptor', async () => {
   it('should intercept request and save body', async () => {
     let result = {};
 
-    interceptor.onEvery((info) => {
+    interceptor.onEveryRequest((info) => {
       result = info;
     });
 

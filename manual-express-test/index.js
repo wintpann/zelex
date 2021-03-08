@@ -9,7 +9,7 @@ if (!fs.existsSync(JSON_LOGS_TEST)) {
   fs.mkdirSync(JSON_LOGS_TEST);
 }
 
-const { LEVEL, createLogger, Transport } = require('../src/index');
+const { createLogger, Transport } = require('../src/index');
 
 const app = express();
 app.use(cors());
@@ -18,7 +18,6 @@ app.use(express.json());
 const customTransport = new Transport.Custom({
   onDataLog: () => log.info('got data log'),
   onRequestLog: () => log.info('got request log'),
-  saveDataLogLevels: [LEVEL.INFO, LEVEL.WARN],
 });
 
 const jsonTransport = new Transport.JSON({
@@ -67,5 +66,17 @@ app.get('/test', (req, res) => {
   });
   res.send('success');
 });
+
+setTimeout(() => {
+  logger.info({
+    step: 'info', name: 'info', description: 'info', data: { random: Math.random() },
+  });
+  logger.fatal({
+    step: 'fatal', name: 'fatal', description: 'fatal', data: { random: Math.random() },
+  });
+  logger.debug({
+    step: 'debug', name: 'debug', description: 'debug', data: { random: Math.random() },
+  });
+}, 1000 * 5);
 
 app.listen(3000, () => log.success('test app listening'));

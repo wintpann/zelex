@@ -1,10 +1,15 @@
 const url = require('url');
+const {
+  optional,
+  string,
+  shape,
+  typeCheck,
+} = require('../../validation/typeCheck');
 const { dig } = require('../../helpers/common');
 const {
   LEVEL_HUMANIZED,
   ZX_PRIVATE,
 } = require('../../config/constants');
-const logger = require('../../utils/logger');
 
 const getTrafficInfo = ({
   req,
@@ -63,7 +68,7 @@ const getExtraInfo = ({ req, res }, extras) => {
   return result;
 };
 
-const getDataLogs = ({ req }) => req.raw[ZX_PRIVATE]
+const getReqDataLogs = ({ req }) => req.raw[ZX_PRIVATE]
   .dataLogs
   .map((log) => ({
     ...log,
@@ -71,22 +76,37 @@ const getDataLogs = ({ req }) => req.raw[ZX_PRIVATE]
   }));
 
 const getRequestLog = (raw, extras) => {
-  let log;
-  try {
-    log = {};
-    log.traffic = getTrafficInfo(raw);
-    log.time = getTimeInfo(raw);
-    log.geo = getGeoInfo(raw);
-    log.request = getRequestInfo(raw);
-    log.response = getResponseInfo(raw);
-    log.extra = getExtraInfo(raw, extras);
-    log.dataLogs = getDataLogs(raw);
-  } catch (e) {
-    logger.error('failed to pull request log', e);
-  }
+  const log = {};
+
+  log.traffic = getTrafficInfo(raw);
+  log.time = getTimeInfo(raw);
+  log.geo = getGeoInfo(raw);
+  log.request = getRequestInfo(raw);
+  log.response = getResponseInfo(raw);
+  log.extra = getExtraInfo(raw, extras);
+  log.dataLogs = getReqDataLogs(raw);
+
+  return log;
+};
+
+const getDataLog = (raw) => {
+  const time = new Date();
+  const log = {
+    ...raw,
+    time,
+    levelHumanized: LEVEL_HUMANIZED[raw.level],
+  };
+  typeCheck(
+    ['step', log.step, optional(string)],
+    ['name', log.name, optional(string)],
+    ['description', log.description, optional(string)],
+    ['data', log.data, optional(shape({}))],
+  ).complete('Data log wont be saved, wrong params');
+
   return log;
 };
 
 module.exports = {
   getRequestLog,
+  getDataLog,
 };

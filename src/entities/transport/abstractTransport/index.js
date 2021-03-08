@@ -125,6 +125,7 @@ class AbstractTransport {
     // TODO send new options via socket
     // TODO method for scanning options
     // TODO filter by date
+    // TODO add ms
   }
 
   // implement in children
@@ -144,6 +145,9 @@ class AbstractTransport {
   }
 
   _getRequestLogs() {
+  }
+
+  _getDataLogs() {
   }
 
   // public

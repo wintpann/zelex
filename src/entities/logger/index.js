@@ -8,6 +8,7 @@ const AbstractTransport = require('../transport/abstractTransport');
 const Interceptor = require('../interceptor');
 const Collector = require('../collector');
 const Server = require('../server');
+const { LEVEL } = require('../../config/constants');
 
 class Logger {
   constructor({
@@ -32,8 +33,8 @@ class Logger {
       extras: this._extras,
     });
 
-    this._interceptor.onEvery((raw) => {
-      this._collector.collect(raw);
+    this._interceptor.onEveryRequest((raw) => {
+      this._collector.collectRequest(raw);
     });
 
     this._server = new Server({
@@ -45,6 +46,30 @@ class Logger {
 
   watch(req, res, next) {
     this._interceptor.watch(req, res, next);
+  }
+
+  info(options) {
+    this._createDataLog(options, LEVEL.INFO);
+  }
+
+  warn(options) {
+    this._createDataLog(options, LEVEL.WARN);
+  }
+
+  error(options) {
+    this._createDataLog(options, LEVEL.ERROR);
+  }
+
+  debug(options) {
+    this._createDataLog(options, LEVEL.DEBUG);
+  }
+
+  fatal(options) {
+    this._createDataLog(options, LEVEL.FATAL);
+  }
+
+  _createDataLog(log, level) {
+    this._collector.collectData({ ...log, level });
   }
 
   _getTransports(transport) {

@@ -20,7 +20,7 @@ class Interceptor {
     next();
   }
 
-  onEvery(callback) {
+  onEveryRequest(callback) {
     this._subscribers.push(callback);
   }
 }
