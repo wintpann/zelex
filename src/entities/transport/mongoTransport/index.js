@@ -75,11 +75,18 @@ class MongoTransport extends AbstractTransport {
   }
 
   async _getRequestLogs(
-    { method, path, code },
+    {
+      method,
+      path,
+      code,
+      dateFrom,
+      dateTo,
+    },
     { pageIndex, pageSize },
     sort,
   ) {
     const query = {};
+    query['time.started'] = {};
 
     if (method.length) {
       query['request.method'] = { $in: method };
@@ -89,6 +96,18 @@ class MongoTransport extends AbstractTransport {
     }
     if (code.length) {
       query['response.code'] = { $in: code };
+    }
+
+    if (dateFrom) {
+      query['time.started'] = { ...query['time.started'], $gte: new Date(dateFrom) };
+    }
+    if (dateTo) {
+      query['time.started'] = { ...query['time.started'], $lte: new Date(dateTo) };
+    }
+
+    const noTimeSpecified = !Object.keys(query['time.started']).length;
+    if (noTimeSpecified) {
+      delete query.time;
     }
 
     const skip = pageIndex * pageSize;
@@ -109,17 +128,31 @@ class MongoTransport extends AbstractTransport {
   }
 
   async _getDataLogs(
-    { name, level },
+    {
+      name, level, dateFrom, dateTo,
+    },
     { pageIndex, pageSize },
     sort,
   ) {
     const query = {};
+    query.time = {};
 
     if (name.length) {
       query.name = { $in: name };
     }
     if (level.length) {
       query.levelHumanized = { $in: level };
+    }
+
+    if (dateFrom) {
+      query.time = { ...query.time, $gte: new Date(dateFrom) };
+    }
+    if (dateTo) {
+      query.time = { ...query.time, $lte: new Date(dateTo) };
+    }
+    const noTimeSpecified = !Object.keys(query.time).length;
+    if (noTimeSpecified) {
+      delete query.time;
     }
 
     const skip = pageIndex * pageSize;

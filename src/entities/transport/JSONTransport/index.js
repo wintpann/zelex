@@ -115,7 +115,9 @@ class JSONTransport extends AbstractTransport {
   }
 
   async _getRequestLogs(
-    { method, path, code },
+    {
+      method, path, code, dateFrom, dateTo,
+    },
     { pageIndex, pageSize },
     sort,
   ) {
@@ -144,6 +146,12 @@ class JSONTransport extends AbstractTransport {
       if (code.length && !code.includes(log.response.code)) {
         return false;
       }
+      if (dateFrom && Number(new Date(log.time.started)) < Number(new Date(dateFrom))) {
+        return false;
+      }
+      if (dateTo && Number(new Date(log.time.started)) > Number(new Date(dateTo))) {
+        return false;
+      }
 
       return true;
     });
@@ -157,7 +165,9 @@ class JSONTransport extends AbstractTransport {
   }
 
   async _getDataLogs(
-    { name, level },
+    {
+      name, level, dateFrom, dateTo,
+    },
     { pageIndex, pageSize },
     sort,
   ) {
@@ -181,6 +191,12 @@ class JSONTransport extends AbstractTransport {
         return false;
       }
       if (level.length && !level.includes(log.levelHumanized)) {
+        return false;
+      }
+      if (dateFrom && Number(new Date(log.time)) < Number(new Date(dateFrom))) {
+        return false;
+      }
+      if (dateTo && Number(new Date(log.time)) > Number(new Date(dateTo))) {
         return false;
       }
 

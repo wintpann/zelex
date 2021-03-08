@@ -1,4 +1,5 @@
 const { REQ_SORT_OPTIONS } = require('../transport/abstractTransport/constants');
+const { isValidDate } = require('../../helpers/common');
 
 const availableRequestSorts = Object.keys(REQ_SORT_OPTIONS);
 
@@ -13,12 +14,16 @@ const getParamsForRequestLogs = (req) => {
     pageSize = '',
     pageIndex = '',
     sort = '',
+    dateFrom = '',
+    dateTo = '',
   } = req.query;
 
   const filter = {
     method: [],
     code: [],
     path: [],
+    dateFrom: '',
+    dateTo: '',
   };
   const pagination = {
     pageSize: 10,
@@ -44,6 +49,20 @@ const getParamsForRequestLogs = (req) => {
       filter.path.push(item);
     }
   });
+
+  dateFrom = Number(dateFrom);
+  dateTo = Number(dateTo);
+
+  const validDateFrom = isValidDate(dateFrom);
+  const validDateTo = isValidDate(dateTo);
+
+  if (validDateFrom) {
+    filter.dateFrom = dateFrom;
+  }
+
+  if (validDateTo) {
+    filter.dateTo = dateTo;
+  }
 
   pageSize = parseInt(pageSize, 10);
   pageIndex = parseInt(pageIndex, 10);
@@ -76,11 +95,15 @@ const getParamsForDataLogs = (req) => {
     pageSize = '',
     pageIndex = '',
     sort = '',
+    dateFrom = '',
+    dateTo = '',
   } = req.query;
 
   const filter = {
     level: [],
     name: [],
+    dateFrom: '',
+    dateTo: '',
   };
   const pagination = {
     pageSize: 10,
@@ -98,6 +121,20 @@ const getParamsForDataLogs = (req) => {
       filter.name.push(item);
     }
   });
+
+  dateFrom = Number(dateFrom);
+  dateTo = Number(dateTo);
+
+  const validDateFrom = isValidDate(dateFrom);
+  const validDateTo = isValidDate(dateTo);
+
+  if (validDateFrom) {
+    filter.dateFrom = dateFrom;
+  }
+
+  if (validDateTo) {
+    filter.dateTo = dateTo;
+  }
 
   pageSize = parseInt(pageSize, 10);
   pageIndex = parseInt(pageIndex, 10);

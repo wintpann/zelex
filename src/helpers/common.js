@@ -79,6 +79,8 @@ const getTimeMs = (time) => {
   return result;
 };
 
+const isValidDate = (date) => new Date(date).toString() !== 'Invalid Date';
+
 module.exports = {
   delay,
   last,
@@ -89,4 +91,5 @@ module.exports = {
   randomNumberInclusive,
   dig,
   getTimeMs,
+  isValidDate,
 };

@@ -144,6 +144,7 @@ class AbstractTransport {
     // TODO send new options via socket
     // TODO method for scanning options
     // TODO filter by date
+    // TODO refactor
   }
 
   _appendDataFilterOptions(dataLog) {
@@ -232,24 +233,32 @@ class AbstractTransport {
       method = [],
       path = [],
       code = [],
+      dateFrom = '',
+      dateTo = '',
     } = filter;
     const {
       pageIndex = 0,
       pageSize = 10,
     } = pagination;
-    return this._getRequestLogs({ method, path, code }, { pageIndex, pageSize }, sort);
+    return this._getRequestLogs({
+      method, path, code, dateFrom, dateTo,
+    }, { pageIndex, pageSize }, sort);
   }
 
   async getDataLogs(filter = {}, pagination = {}, sort = DEFAULT_DATA_SORT_KEY) {
     const {
       level = [],
       name = [],
+      dateFrom = '',
+      dateTo = '',
     } = filter;
     const {
       pageIndex = 0,
       pageSize = 10,
     } = pagination;
-    return this._getDataLogs({ name, level }, { pageIndex, pageSize }, sort);
+    return this._getDataLogs({
+      name, level, dateFrom, dateTo,
+    }, { pageIndex, pageSize }, sort);
   }
 }
 
