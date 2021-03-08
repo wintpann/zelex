@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const AbstractTransport = require('../abstractTransport');
-const { REQ_SORT_OPTIONS } = require('../abstractTransport/constants');
+const { REQ_SORT_OPTIONS, DATA_SORT_OPTIONS } = require('../abstractTransport/constants');
 const { DB_OPTIONS } = require('./constants');
 const logger = require('../../../utils/logger');
 
@@ -109,8 +109,34 @@ class MongoTransport extends AbstractTransport {
   }
 
   async _getDataLogs(
+    { name, level },
+    { pageIndex, pageSize },
+    sort,
   ) {
-    return { result: [], nextPageExists: false };
+    const query = {};
+
+    if (name.length) {
+      query.name = { $in: name };
+    }
+    if (level.length) {
+      query.levelHumanized = { $in: level };
+    }
+
+    const skip = pageIndex * pageSize;
+
+    const logs = await this._dataLog
+      .find(query)
+      .sort(DATA_SORT_OPTIONS[sort].mongo)
+      .skip(skip)
+      .limit(pageSize + 1)
+      .lean();
+
+    const nextPageExists = logs.length > pageSize;
+    if (nextPageExists) {
+      logs.pop();
+    }
+
+    return { result: logs, nextPageExists };
   }
 }
 

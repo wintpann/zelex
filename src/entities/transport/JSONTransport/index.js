@@ -1,6 +1,6 @@
 const fs = require('fs');
 const AbstractTransport = require('../abstractTransport');
-const { REQ_SORT_OPTIONS } = require('../abstractTransport/constants');
+const { REQ_SORT_OPTIONS, DATA_SORT_OPTIONS } = require('../abstractTransport/constants');
 const logger = require('../../../utils/logger');
 const { randomNumberString } = require('../../../helpers/common');
 const { readdir, readFile } = require('../../../helpers/promisified');
@@ -38,7 +38,7 @@ class JSONTransport extends AbstractTransport {
   _checkServeOptions() {
     const serveURLPassed = Boolean(this._serveURL);
     if (serveURLPassed) {
-      logger.warn('You passed serveURL to JSON transport. Assume that serving by JSON transport is not good idea');
+      logger.warn('You passed serveURL to JSON transport. Assume that serving by JSON transport is BAD IDEA for production');
     }
   }
 
@@ -121,7 +121,7 @@ class JSONTransport extends AbstractTransport {
   ) {
     let logs = await readdir(this._requestPath);
 
-    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}${EXTENSION}`, { encoding: 'utf-8' }));
+    logs = logs.map((filePath) => readFile(`${this._requestPath}/${filePath}`, { encoding: 'utf-8' }));
 
     logs = await Promise.all(logs);
 
@@ -157,8 +157,42 @@ class JSONTransport extends AbstractTransport {
   }
 
   async _getDataLogs(
+    { name, level },
+    { pageIndex, pageSize },
+    sort,
   ) {
-    return { result: [], nextPageExists: false };
+    let logs = await readdir(this._dataPath);
+
+    logs = logs.map((filePath) => readFile(`${this._dataPath}/${filePath}`, { encoding: 'utf-8' }));
+
+    logs = await Promise.all(logs);
+
+    logs = logs.map((log) => JSON.parse(log));
+
+    logs = logs.filter((log, index) => {
+      const paginationRangeMin = pageIndex * pageSize;
+      const paginationRangeMax = paginationRangeMin + pageSize + 1;
+      const notInRange = index < paginationRangeMin || index > paginationRangeMax;
+      if (notInRange) {
+        return false;
+      }
+
+      if (name.length && !name.includes(log.name)) {
+        return false;
+      }
+      if (level.length && !level.includes(log.levelHumanized)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    logs.sort(DATA_SORT_OPTIONS[sort].json);
+    const nextPageExists = logs.length > pageSize;
+    if (nextPageExists) {
+      logs.pop();
+    }
+    return { result: logs, nextPageExists };
   }
 }
 

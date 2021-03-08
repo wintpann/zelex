@@ -50,7 +50,21 @@ const REQ_SORT_OPTIONS = {
   },
 };
 
+const DATA_SORT_OPTIONS = {
+  createDateAsc: {
+    mongo: { time: 1 },
+    json: (a, b) => a.time > b.time,
+    dropdown: { id: 'createDateAsc', name: 'Creation Date (increasing)' },
+  },
+  createDateDesc: {
+    mongo: { time: -1 },
+    json: (a, b) => a.time < b.time,
+    dropdown: { id: 'createDateDesc', name: 'Creation Date (decreasing)' },
+  },
+};
+
 const DEFAULT_REQ_SORT_KEY = Object.keys(REQ_SORT_OPTIONS)[0];
+const DEFAULT_DATA_SORT_KEY = Object.keys(DATA_SORT_OPTIONS)[0];
 
 module.exports = {
   CLEAR_INTERVAL,
@@ -60,5 +74,7 @@ module.exports = {
   SAVE_DATA_LOG_LEVELS,
   DEFAULT_AUTH,
   DEFAULT_REQ_SORT_KEY,
+  DEFAULT_DATA_SORT_KEY,
   REQ_SORT_OPTIONS,
+  DATA_SORT_OPTIONS,
 };

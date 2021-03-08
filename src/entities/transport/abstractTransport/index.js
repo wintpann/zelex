@@ -8,6 +8,8 @@ const {
   typeCheck,
 } = require('../../../validation/typeCheck');
 const logger = require('../../../utils/logger');
+const { LEVEL_HUMANIZED } = require('../../../config/constants');
+const { LEVEL } = require('../../../config/constants');
 const { mapDropdownValue } = require('../../../helpers/serve');
 const {
   CLEAR_INTERVAL,
@@ -18,6 +20,8 @@ const {
   DEFAULT_AUTH,
   REQ_SORT_OPTIONS,
   DEFAULT_REQ_SORT_KEY,
+  DATA_SORT_OPTIONS,
+  DEFAULT_DATA_SORT_KEY,
 } = require('./constants');
 
 class AbstractTransport {
@@ -59,6 +63,12 @@ class AbstractTransport {
       code: new Set(),
     };
     this._reqSortOptions = REQ_SORT_OPTIONS;
+
+    this._dataFilterOptions = {
+      level: new Set(LEVEL.ALL.map((level) => LEVEL_HUMANIZED[level])),
+      name: new Set(),
+    };
+    this._dataSortOptions = DATA_SORT_OPTIONS;
   }
 
   _validateAbstractTransportInit() {
@@ -128,6 +138,15 @@ class AbstractTransport {
     // TODO add ms
   }
 
+  _appendDataFilterOptions(dataLog) {
+    if (!this._canServe) {
+      return;
+    }
+
+    const { name } = dataLog;
+    this._dataFilterOptions.name.add(name);
+  }
+
   // implement in children
   _uploadRequestLogs() {
   }
@@ -161,6 +180,7 @@ class AbstractTransport {
   collectDataLog(log) {
     const shouldSave = log.level & this._saveDataLogFlag;
     if (shouldSave) {
+      this._appendDataFilterOptions(log);
       this._dataLogs.push(log);
     }
   }
@@ -184,7 +204,19 @@ class AbstractTransport {
   }
 
   getDataOptions() {
-    return [];
+    const level = [...this._dataFilterOptions.level].map(mapDropdownValue);
+    const name = [...this._dataFilterOptions.name].map(mapDropdownValue);
+
+    const sort = Object.values(this._dataSortOptions).map(({ dropdown }) => dropdown);
+
+    const options = {
+      filter: {
+        level,
+        name,
+      },
+      sort,
+    };
+    return options;
   }
 
   async getRequestLogs(filter = {}, pagination = {}, sort = DEFAULT_REQ_SORT_KEY) {
@@ -200,8 +232,16 @@ class AbstractTransport {
     return this._getRequestLogs({ method, path, code }, { pageIndex, pageSize }, sort);
   }
 
-  async getDataLogs() {
-    return this._getDataLogs();
+  async getDataLogs(filter = {}, pagination = {}, sort = DEFAULT_DATA_SORT_KEY) {
+    const {
+      level = [],
+      name = [],
+    } = filter;
+    const {
+      pageIndex = 0,
+      pageSize = 10,
+    } = pagination;
+    return this._getDataLogs({ name, level }, { pageIndex, pageSize }, sort);
   }
 }
 
