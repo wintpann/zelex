@@ -31,8 +31,10 @@ const getNotInDateRange = (dateFrom, dateTo, value) => {
 };
 
 const getNotInOptions = (...options) => {
-  let i = options.length;
-  for (;i > 0; i--) {
+  let i = 0;
+  const len = options.length;
+
+  for (; i < len; i++) {
     const [available, value] = options[i];
     if (available.length && !available.includes(value)) {
       return true;

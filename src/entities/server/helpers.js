@@ -13,6 +13,10 @@ const getQueryOptions = (
   isValidItemFn = Boolean,
   mapFn,
 ) => {
+  if (!value) {
+    return [];
+  }
+
   const options = [];
   String(value).split(',').forEach((item) => {
     const isValid = isValidItemFn(item);
@@ -20,6 +24,7 @@ const getQueryOptions = (
       options.push(mapFn ? mapFn(item) : item);
     }
   });
+
   return options;
 };
 
