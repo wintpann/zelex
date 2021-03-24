@@ -30,7 +30,8 @@
     "go": "node go-test",
     "seed": "node go-test/seeds",
     "test": "mocha src/**/__test__/*.js --exit",
-    "precommit": "yarn lint-staged && yarn test"
+    "precommit": "yarn lint-staged && yarn test",
+    "apidoc": "apidoc -i src/ -o doc/"
   },
   "husky": {
     "hooks": {
