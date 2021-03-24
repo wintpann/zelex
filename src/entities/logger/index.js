@@ -2,6 +2,7 @@ const express = require('express');
 const {
   shape,
   func,
+  optional,
   typeCheck,
 } = require('../../validation/typeCheck');
 const AbstractTransport = require('../transport/abstractTransport');
@@ -14,7 +15,7 @@ class Logger {
   constructor({
     transport,
     app,
-    extras,
+    extras = {},
   } = {}) {
     this._transports = this._getTransports(transport);
     this._app = app;
@@ -81,8 +82,8 @@ class Logger {
     typeCheck(
       ['app.use', this._app.use, func],
       ['app.get', this._app.get, func],
-      ['extras', this._extras, shape({})],
-    );
+      ['extras', this._extras, optional(shape({}))],
+    ).complete('Failed to create logger');
   }
 
   _validateTransports() {
