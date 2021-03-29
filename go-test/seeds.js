@@ -1,9 +1,9 @@
 const fs = require('fs');
 const express = require('express');
-const { LEVEL } = require('../src/config/constants');
-const log = require('../src/utils/logger');
-const { getMockDataLog, getMockRequestLog } = require('../src/mocks');
-const { getTimeMs } = require('../src/helpers/common');
+const { LEVEL } = require('../src/server/config/constants');
+const log = require('../src/server/utils/logger');
+const { getMockDataLog, getMockRequestLog } = require('../src/server/mocks');
+const { getTimeMs } = require('../src/server/helpers/common');
 
 const ago = (time) => Date.now() - getTimeMs(time);
 
@@ -49,7 +49,7 @@ if (!fs.existsSync(JSON_GO_TEST)) {
   fs.mkdirSync(JSON_GO_TEST);
 }
 
-const { createLogger, Transport } = require('../src/index');
+const { createLogger, Transport } = require('../src/server');
 
 const app = express();
 

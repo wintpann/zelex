@@ -2,7 +2,7 @@
   "name": "zelex",
   "version": "0.0.0",
   "description": "NodeJs express logger",
-  "main": "src/index.js",
+  "main": "src/server/index.js",
   "keywords": [
     "node",
     "nodejs",
@@ -29,9 +29,9 @@
     "post": "curl -X POST localhost:3000/post",
     "go": "node go-test",
     "seed": "node go-test/seeds",
-    "test": "mocha src/**/__test__/*.js --exit",
+    "test": "mocha src/server/**/__test__/*.js --exit",
     "precommit": "yarn lint-staged && yarn test",
-    "apidoc": "apidoc -i src/ -o doc/"
+    "apidoc": "apidoc -i src/server -o doc/"
   },
   "husky": {
     "hooks": {

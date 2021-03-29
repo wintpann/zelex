@@ -1,7 +1,7 @@
 const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
-const log = require('../src/utils/logger');
+const log = require('../src/server/utils/logger');
 
 const JSON_GO_TEST = 'JSON_GO_TEST';
 
@@ -9,7 +9,7 @@ if (!fs.existsSync(JSON_GO_TEST)) {
   fs.mkdirSync(JSON_GO_TEST);
 }
 
-const { createLogger, Transport } = require('../src/index');
+const { createLogger, Transport } = require('../src/server');
 
 const app = express();
 app.use(cors());
